@@ -24,14 +24,21 @@ class Position2D:
     
 
 class BrickType(Enum):
-    BLANC = 1
-    ORANGE = 2
-    CYAN = 3
-    VERT = 4
-    ROUGE = 5
-    BLEU = 6
-    MAGENTA = 7
-    JAUNE = 8
-    ARGENT = 9
-    OR = 10
+    _NONE       = 0
+    WHITE       = 1
+    ORANGE      = 2
+    CYAN        = 3
+    GREEN       = 4
+    RED         = 5
+    BLUE        = 6
+    MAGENTA     = 7
+    YELLOW      = 8
+    SILVER      = 9
+    GOLD        = 10
+
+
+class Action(Enum):
+    _NONE = 0
+    LEFT = 1
+    RIGHT = 2
 

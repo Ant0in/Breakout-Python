@@ -44,3 +44,5 @@ class Raquette:
         # On move la raquette avec sa hitbox.
         self.setPosition(p=c)
         self.getHitbox().setPosition(p=c)
+
+

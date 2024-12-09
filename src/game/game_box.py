@@ -2,6 +2,8 @@
 
 from src.game.collision_helper import CollisionHelper
 from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
+from src.game.ball import Ball
+from src.game.raquette import Raquette
 
 from src.common import Position2D
 import itertools
@@ -10,11 +12,15 @@ import itertools
 
 class GameBox:
 
-    def __init__(self, position: Position2D, width: float, height: float) -> None:
+    def __init__(self, position: Position2D, width: float, height: float, balls: list[Ball], raquette: Raquette) -> None:
 
         self._position: Position2D = position
         self._width: float = width
         self._height: float = height
+
+        self._balls: list[Ball] = balls
+        self._raquette: Raquette = raquette
+        self._bricks: list[SolidInterface] = list()
         self._entities: list[SolidInterface] = list()
 
     def getPosition(self) -> Position2D:
@@ -26,11 +32,31 @@ class GameBox:
     def getHeight(self) -> float:
         return self._height
 
-    def addEntity(self, entity: SolidInterface) -> None:
-        self._entities.append(entity)
-
     def getEntities(self) -> list[SolidInterface]:
         return self._entities
+
+    def addEntity(self, entity: SolidInterface) -> None:
+        self.getEntities().append(entity)
+
+    def removeEntity(self, entity: SolidInterface) -> None:
+        entities: list[SolidInterface] = self.getEntities()
+        if entity in entities: entities.remove(entity)
+
+    def getBricks(self) -> list[SolidInterface]:
+        return self._bricks
+    
+    def addBrick(self, brick: SolidInterface) -> None:
+        self.getBricks().append(brick)
+
+    def removeBrick(self, brick: SolidInterface) -> None:
+        bricks: list[SolidInterface] = self.getBricks()
+        if brick in bricks: bricks.remove(brick)
+
+    def getBalls(self) -> list[Ball]:
+        return self._balls
+    
+    def getRaquette(self) -> Raquette:
+        return self._raquette
 
     def isOutOfBounds(self, entity: SolidInterface) -> bool:
 
@@ -54,22 +80,29 @@ class GameBox:
         
         else: raise NotImplementedError(f"[e] Unknown entity type for isOutOfBounds. (e={entity})")
 
-    def checkCollisions(self) -> list[SolidInterface]:
+
+
+    def checkCollisionsWithEntities(self) -> list[SolidInterface]:
 
         colliding_entities: list[SolidInterface] = []
-        entities: list[SolidInterface] = self.getEntities()
-        
-        # Si jamais une seule entité (ou aucune), on ne regarde même pas,
-        # pas de collision possible.
-        if len(entities) < 2:
-            return list()
-
-        # On génère toutes les combinasions de deux entitées pour check collisions
-        for entity1, entity2 in itertools.combinations(entities, 2):
-            
-            if CollisionHelper.isColliding(entity1, entity2):
-                colliding_entities += [entity1, entity2]
+ 
+        # On regarde si une entité collide avec la raquette
+        for entity in self.getEntities():
+            if CollisionHelper.isColliding(self.getRaquette().getHitbox(), entity):
+                colliding_entities.append(entity)
         
         return colliding_entities
+    
+    def checkCollisionsWithBricks(self) -> list[SolidInterface]:
 
+        colliding_bricks: list[SolidInterface] = []
+ 
+        # On regarde si une brique collide avec une balle
+        for brick in self.getEntities():
+            for ball in self.getBalls():
+
+                if CollisionHelper.isColliding(ball.getHitbox(), brick):
+                    colliding_bricks.append(brick)
+        
+        return colliding_bricks
 
