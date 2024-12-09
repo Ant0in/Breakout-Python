@@ -11,14 +11,12 @@ class SolidInterface(ABC):
         pass
 
 
-
 class SolidRectangle(SolidInterface):
 
     def __init__(self, position: Position2D, height: float, width: float) -> None:
-        
         self._position: Position2D = position
-        self._width: int = width
-        self._height: int = height
+        self._width: float = width
+        self._height: float = height
 
     def getPosition(self) -> Position2D:
         return self._position
@@ -32,25 +30,25 @@ class SolidRectangle(SolidInterface):
     def getWidth(self) -> float:
         return self._width
     
-    def isPointInSolid(self, point: Position2D) -> bool:
-        
+    def getCorners(self) -> list[Position2D]:
         top_left: Position2D = self.getPosition()
-        
-        if \
-        (
-            top_left.getX() <= point.getX() <= top_left.getX() + self.getWidth() and \
+        top_right: Position2D = Position2D(top_left.getX() + self.getWidth(), top_left.getY())
+        bottom_left: Position2D = Position2D(top_left.getX(), top_left.getY() + self.getHeight())
+        bottom_right: Position2D = Position2D(top_left.getX() + self.getWidth(), top_left.getY() + self.getHeight())
+        return [top_left, top_right, bottom_left, bottom_right]
+
+    def isPointInSolid(self, point: Position2D) -> bool:
+
+        top_left: Position2D = self.getPosition()
+        return (
+            top_left.getX() <= point.getX() <= top_left.getX() + self.getWidth() and
             top_left.getY() <= point.getY() <= top_left.getY() + self.getHeight()
-        ):
-            return False
-        
-        return True
-    
+        )
 
 
 class SolidCircle(SolidInterface):
 
     def __init__(self, position: Position2D, radius: float) -> None:
-        
         self._position: Position2D = position
         self._radius: float = radius
 
@@ -67,16 +65,7 @@ class SolidCircle(SolidInterface):
         self._radius = r
     
     def isPointInSolid(self, point: Position2D) -> bool:
-        
-        # Pour savoir on regarde si la distance euclidienne du point au centre est plus grande
-        # que le radius. Si c'est le cas, alors pas collision (sinon oui).
-        
         center: Position2D = self.getPosition()
         ds_sq: float = (point.getX() - center.getX()) ** 2 + (point.getY() - center.getY()) ** 2
-        rad_sq: float = self.getRadius() ** 2
-
-        return ds_sq <= rad_sq
-
-
-
+        return ds_sq <= self.getRadius() ** 2
 

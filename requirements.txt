@@ -1,6 +1,0 @@
-laser-learning-environment==0.2.6
-typing-extensions==4.12.2
-opencv-python==4.10.0.84
-seaborn==0.13.0
-multi-agent-rlenv
-rlenv
