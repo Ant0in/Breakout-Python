@@ -1,12 +1,24 @@
+
+
+from src.game.collision_helper import CollisionHelper
+from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
+
+from src.common import Position2D
+import itertools
+
+
+
 class GameBox:
 
-    def __init__(self, width: float, height: float) -> None:
-        """
-        Initialise une box de jeu avec une largeur et une hauteur données.
-        """
-        self._width = width
-        self._height = height
-        self._entities: list[SolidInterface] = []
+    def __init__(self, position: Position2D, width: float, height: float) -> None:
+
+        self._position: Position2D = position
+        self._width: float = width
+        self._height: float = height
+        self._entities: list[SolidInterface] = list()
+
+    def getPosition(self) -> Position2D:
+        return self._position
 
     def getWidth(self) -> float:
         return self._width
@@ -15,62 +27,49 @@ class GameBox:
         return self._height
 
     def addEntity(self, entity: SolidInterface) -> None:
-        """
-        Ajoute une entité dans la box.
-        """
         self._entities.append(entity)
 
     def getEntities(self) -> list[SolidInterface]:
-        """
-        Retourne la liste des entités présentes dans la box.
-        """
         return self._entities
 
     def isOutOfBounds(self, entity: SolidInterface) -> bool:
-        """
-        Vérifie si une entité est hors des limites de la box.
-        """
+
         if isinstance(entity, SolidRectangle):
-            rect = entity
+            rect: SolidRectangle = entity
             return (
-                rect.getPosition().getX() < 0 or
-                rect.getPosition().getY() < 0 or
-                rect.getPosition().getX() + rect.getWidth() > self.getWidth() or
-                rect.getPosition().getY() + rect.getHeight() > self.getHeight()
+                rect.getPosition().getX() < self.getPosition().getX() or
+                rect.getPosition().getY() < self.getPosition().getY() or
+                rect.getPosition().getX() + rect.getWidth() > self.getPosition().getX() + self.getWidth() or
+                rect.getPosition().getY() + rect.getHeight() > self.getPosition().getY() + self.getHeight()
             )
+        
         elif isinstance(entity, SolidCircle):
             circle = entity
             return (
-                circle.getPosition().getX() - circle.getRadius() < 0 or
-                circle.getPosition().getY() - circle.getRadius() < 0 or
-                circle.getPosition().getX() + circle.getRadius() > self.getWidth() or
-                circle.getPosition().getY() + circle.getRadius() > self.getHeight()
+                circle.getPosition().getX() - circle.getRadius() < self.getPosition().getX() or
+                circle.getPosition().getY() - circle.getRadius() < self.getPosition().getY() or
+                circle.getPosition().getX() + circle.getRadius() > self.getPosition().getX() + self.getWidth() or
+                circle.getPosition().getY() + circle.getRadius() > self.getPosition().getY() + self.getHeight()
             )
-        else:
-            raise NotImplementedError("Type d'entité non supporté pour isOutOfBounds.")
+        
+        else: raise NotImplementedError(f"[e] Unknown entity type for isOutOfBounds. (e={entity})")
 
-    def checkCollisions(self) -> list[tuple[SolidInterface, SolidInterface]]:
-        """
-        Vérifie les collisions entre toutes les entités dans la box.
-        Retourne une liste de tuples représentant les paires d'entités en collision.
-        """
-        collisions = []
-        for i, entity1 in enumerate(self._entities):
-            for entity2 in self._entities[i + 1:]:
-                if CollisionHelper.isColliding(entity1, entity2):
-                    collisions.append((entity1, entity2))
-        return collisions
+    def checkCollisions(self) -> list[SolidInterface]:
 
-    def update(self) -> None:
-        """
-        Met à jour l'état de la box :
-        - Vérifie les entités hors limites.
-        - Détecte les collisions.
-        """
-        for entity in self._entities:
-            if self.isOutOfBounds(entity):
-                print(f"Entity {entity} is out of bounds!")
+        colliding_entities: list[SolidInterface] = []
+        entities: list[SolidInterface] = self.getEntities()
+        
+        # Si jamais une seule entité (ou aucune), on ne regarde même pas,
+        # pas de collision possible.
+        if len(entities) < 2:
+            return list()
 
-        collisions = self.checkCollisions()
-        for e1, e2 in collisions:
-            print(f"Collision detected between {e1} and {e2}!")
+        # On génère toutes les combinasions de deux entitées pour check collisions
+        for entity1, entity2 in itertools.combinations(entities, 2):
+            
+            if CollisionHelper.isColliding(entity1, entity2):
+                colliding_entities += [entity1, entity2]
+        
+        return colliding_entities
+
+
