@@ -1,6 +1,8 @@
 
 
-from src.game.solid_shapes import SolidRectangle, SolidCircle, CollisionHelper
+from src.game.solid_shapes import SolidRectangle, SolidCircle
+from src.game.collision_helper import CollisionHelper
+
 from src.common import Position2D
 
 
