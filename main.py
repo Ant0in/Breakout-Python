@@ -1,14 +1,17 @@
 
 
-from src.game.collision_helper import CollisionHelper
-from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
+
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.game_box import GameBox
+from src.game.brick import Brick
 
-from src.common import Position2D
+from src.common import Position2D, BrickType
 from src.gui.gui import GameGUI
 from src.engine import GameEngine
+
+
+
 
 
 
@@ -20,19 +23,18 @@ if __name__ == "__main__":
         height=800,
         balls=[
             Ball(Position2D(200, 200), 10, 10),
-            Ball(Position2D(600, 400), 50, 5)
+            Ball(Position2D(10, 10), 10, 20)
         ],
-        raquette=Raquette(Position2D(150, 400), 300, 20, 10)
+        raquette=Raquette(Position2D(150, 400), 300, 20, 10),
+        bricks=[Brick(Position2D(50, 50), 60, 20, BrickType.CYAN), Brick(Position2D(200, 50), 60, 20, BrickType.SILVER)]
     )
 
-    bricks: list[SolidRectangle] = [SolidRectangle(Position2D(50, 50), 60, 20), SolidRectangle(Position2D(200, 50), 60, 20)] 
-    for brick in bricks: gamebox.addBrick(brick)
-
     gui: GameGUI = GameGUI(gamebox)
-    def game_loop():
-        GameEngine._handle_balls(gamebox=gamebox)
-        gui.update_gui()
-        gui.after(16, game_loop)
 
-    game_loop()
+    def mainloop():
+        GameEngine.handle_routine(gamebox=gamebox)
+        gui.update_gui()
+        gui.after(16, mainloop)
+
+    mainloop()
     gui.mainloop()

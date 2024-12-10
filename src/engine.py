@@ -6,6 +6,7 @@ from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.game_box import GameBox
+from src.game.brick import Brick
 
 from src.common import Position2D, Action
 
@@ -15,7 +16,7 @@ class GameEngine:
 
     @staticmethod
     def _handle_inputs() -> Action:
-        ...
+        return Action._NONE
 
     @staticmethod
     def _handle_actions(gamebox: GameBox, action: Action) -> bool:
@@ -50,7 +51,7 @@ class GameEngine:
         return pvec
     
     @staticmethod
-    def _handle_balls(gamebox: GameBox) -> list[SolidRectangle]:
+    def _handle_balls(gamebox: GameBox) -> list[Brick]:
 
         # On va calculer les nouvelles positions des balles puis tenter de les déplacer.
         pvec: list[Position2D] = GameEngine._calculate_balls_positions(gamebox=gamebox)
@@ -61,3 +62,40 @@ class GameEngine:
         bricks_hit: list[SolidRectangle] = gamebox.checkCollisionsWithRaquetteAndBricks()
         return bricks_hit
     
+    @staticmethod
+    def _handle_brick_destruction(gamebox: GameBox, bricks: list[Brick]) -> int:
+        
+        total_reward: int = 0
+
+        for b in bricks:
+
+            b.makeBrickLooseHP(loss=1)
+
+            if b.isBroken():
+
+                # TODO : spawn des bonus ici
+
+                gamebox.removeBrick(brick=b)
+                total_reward += b.getBrickValue()
+
+        return total_reward
+
+    @staticmethod
+    def handle_routine(gamebox: GameBox) -> None:
+
+        # Gestion des actions
+        player_action: Action = GameEngine._handle_inputs()
+        GameEngine._handle_actions(gamebox=gamebox, action=player_action)
+
+        # Gestion des collisions (briques / balles / raquette)
+        bricks_hit: list[Brick] = GameEngine._handle_balls(gamebox=gamebox)
+        reward: int = GameEngine._handle_brick_destruction(gamebox=gamebox, bricks=bricks_hit)
+
+        # TODO : Gestion des bonus (utilisation bonus / collision bonus (pickup) / fin d'un bonus actif)
+        ...
+
+        # TODO : Gestion du score (via 'reward')
+        ...
+
+        # TODO : Gestion 'fin de niveau'
+        ...
