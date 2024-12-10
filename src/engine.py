@@ -1,11 +1,10 @@
 
 
-
-from src.game.collision_helper import CollisionHelper
+from src.game.game_box import GameBox
 from src.game.ball import Ball
 from src.game.raquette import Raquette
-from src.game.game_box import GameBox
 from src.game.brick import Brick
+from src.game.score import Score
 
 from src.controller import GameController
 from src.common import Position2D, Action
@@ -56,7 +55,7 @@ class GameEngine:
         pvec: list[Position2D] = GameEngine._calculate_balls_positions(gamebox=gamebox)
         could_move: list[bool] = gamebox.tryMoveBalls(p_vec=pvec)
 
-        # Puis on applique les collisions avec les murs / briques
+        # on applique les collisions avec les briques
         gamebox.checkCollisionsWithWalls()
         bricks_hit: list[Brick] = gamebox.checkCollisionsWithRaquetteAndBricks()
         return bricks_hit
@@ -80,21 +79,22 @@ class GameEngine:
         return total_reward
 
     @staticmethod
-    def handle_routine(gamebox: GameBox, controller: GameController) -> None:
+    def handle_routine(gamebox: GameBox, controller: GameController, score: Score) -> None:
 
         # Gestion des actions
         player_action: Action = GameEngine._handle_inputs(controller=controller)
         GameEngine._handle_actions(gamebox=gamebox, action=player_action)
 
-        # Gestion des collisions (briques / balles / raquette)
+        # Gestion des collisions (briques / balles / raquette) et du score
         bricks_hit: list[Brick] = GameEngine._handle_balls(gamebox=gamebox)
         reward: int = GameEngine._handle_brick_destruction(gamebox=gamebox, bricks=bricks_hit)
+        score.addScore(increment=reward)
+
 
         # TODO : Gestion des bonus (utilisation bonus / collision bonus (pickup) / fin d'un bonus actif)
         ...
 
-        # TODO : Gestion du score (via 'reward')
+
+        # TODO : Gestion 'fin de niveau' (plus aucune balle active ou plus aucune brique non dorée)
         ...
 
-        # TODO : Gestion 'fin de niveau'
-        ...

@@ -1,11 +1,27 @@
 
 
 import tkinter as tk
-from src.common import Position2D
-from src.game.ball import Ball
-from src.game.raquette import Raquette
+import time
+
+
 from src.game.solid_shapes import SolidRectangle, SolidCircle
 from src.game.game_box import GameBox
+from src.common import BrickType
+
+
+BRICK_COLORS: dict = {
+    BrickType._NONE: "#000000",
+    BrickType.WHITE: "#FFFFFF",  # Blanc
+    BrickType.ORANGE: "#FFA500",  # Orange
+    BrickType.CYAN: "#00FFFF",   # Cyan
+    BrickType.GREEN: "#008000",  # Vert
+    BrickType.RED: "#FF0000",    # Rouge
+    BrickType.BLUE: "#0000FF",   # Bleu
+    BrickType.MAGENTA: "#FF00FF", # Magenta
+    BrickType.YELLOW: "#FFFF00", # Jaune
+    BrickType.SILVER: "#C0C0C0", # Argent
+    BrickType.GOLD: "#FFD700",   # Or
+}
 
 
 
@@ -13,10 +29,11 @@ class GameGUI(tk.Tk):
 
     def __init__(self, gamebox: GameBox):
         super().__init__()
-        self.title("Arkanoid Python")
+        self.title(f"Arkanoid Python")
         self.canvas: tk.Canvas = tk.Canvas(self, width=gamebox.getWidth(), height=gamebox.getHeight())
         self.canvas.pack()
         self.gamebox = gamebox
+        self.lastupdate = time.time()
 
     def update_gui(self):
 
@@ -27,7 +44,18 @@ class GameGUI(tk.Tk):
         # dessiner les balls
         for ball in self.gamebox.getBalls(): self.draw_circle(ball.getHitbox(), fill="red")
         # dessiner les bricks
-        for brick in self.gamebox.getBricks(): self.draw_rectangle(brick, fill="green")
+        for brick in self.gamebox.getBricks(): self.draw_rectangle(brick, fill=BRICK_COLORS[brick.getBrickType()])
+        self.update_fps()
+
+
+    def update_fps(self):
+        current = time.time()
+        delta = current - self.lastupdate
+        fps = 1 / delta if delta > 0 else 0
+        self.lastupdate = current
+        self.title(f'Arkanoid Python - {round(fps)} FPS')
+
+
     
     def draw_rectangle(self, rect: SolidRectangle, fill: str) -> None:
         x1: float = rect.getPosition().getX()

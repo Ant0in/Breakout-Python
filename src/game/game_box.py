@@ -7,6 +7,8 @@ from src.game.raquette import Raquette
 from src.game.brick import Brick
 
 from src.common import Position2D
+import math
+
 
 
 class GameBox:
@@ -74,27 +76,24 @@ class GameBox:
         return can_move
 
     def tryMoveBalls(self, p_vec: list[Position2D]) -> list[bool]:
+        
         balls: list[Ball] = self.getBalls()
 
         can_move: list[bool] = [
             (
-                self.getPosition().getX() <= p.getX() - ball.getRadius() and \
-                self.getPosition().getY() <= p.getY() - ball.getRadius() and \
-                self.getPosition().getX() + self.getWidth() >= p.getX() + ball.getRadius() and \
-                self.getPosition().getY() + self.getHeight() >= p.getY() + ball.getRadius()
-            )
-            for p, ball in zip(p_vec, balls)
-        ]
+                self.getPosition().getX() < p.getX() < self.getPosition().getX() + self.getWidth() and \
+                self.getPosition().getY() < p.getY() < self.getPosition().getY() + self.getHeight()
+            ) for p in p_vec]
 
         # Déplacer les balles si possible
         for p, flag, ball in zip(p_vec, can_move, balls):
             if flag: ball.moveToCoordinates(c=p)
+            else: ball.moveToCoordinates(c=p)
 
         return can_move
 
     def checkCollisionsWithWalls(self) -> None:
         
-        # Pour chacune des balls, on applique un check de collision.
         for ball in self.getBalls():
             
             ball_pos: Position2D = ball.getCenterPosition()
@@ -102,15 +101,21 @@ class GameBox:
             vx, vy = ball.getVelocity()
 
             # Mur gauche
-            if ball_pos.getX() - ball_radius <= self.getPosition().getX() and vx < 0: ball.setVelocity(-vx, vy)
+            if ball_pos.getX() - ball_radius <= self.getPosition().getX() and vx < 0:
+                ball.setVelocity(-vx, vy)
+                ball.moveToCoordinates(Position2D(self.getPosition().getX() + ball_radius, ball_pos.getY()))
             # Mur droit
-            elif ball_pos.getX() + ball_radius >= self.getPosition().getX() + self.getWidth() and vx > 0: ball.setVelocity(-vx, vy)
+            elif ball_pos.getX() + ball_radius >= self.getPosition().getX() + self.getWidth() and vx > 0:
+                ball.setVelocity(-vx, vy)
+                ball.moveToCoordinates(Position2D(self.getPosition().getX() + self.getWidth() - ball_radius, ball_pos.getY()))
             # Mur haut
-            if ball_pos.getY() - ball_radius <= self.getPosition().getY() and vy < 0: ball.setVelocity(vx, -vy)
+            if ball_pos.getY() - ball_radius <= self.getPosition().getY() and vy < 0:
+                ball.setVelocity(vx, -vy)
+                ball.moveToCoordinates(Position2D(ball_pos.getX(), self.getPosition().getY() + ball_radius))
             # Mur bas
-            elif ball_pos.getY() + ball_radius >= self.getPosition().getY() + self.getHeight() and vy > 0: ball.setVelocity(vx, -vy)
-
-            else: pass
+            elif ball_pos.getY() + ball_radius >= self.getPosition().getY() + self.getHeight() and vy > 0:
+                ball.setVelocity(vx, -vy)
+                ball.moveToCoordinates(Position2D(ball_pos.getX(), self.getPosition().getY() + self.getHeight() - ball_radius))
 
     def checkCollisionsWithRaquetteAndBricks(self) -> list[Brick]:
         
@@ -122,7 +127,18 @@ class GameBox:
 
             # Collision avec la raquette
             if CollisionHelper.isColliding(ball.getHitbox(), self.getRaquette().getHitbox()):
-                ball.setVelocity(vx, -vy)
+
+                total_velocity: float = math.sqrt((vx**2 + vy**2))
+                L: float = self.getRaquette().getWidth()
+                x: float = ball.getCenterPosition().getX() - self.getRaquette().calculateCenterPosition().getX()
+                alpha: float = (math.pi / 6) + ((5 * math.pi) / 6) * (1 - (x / L))  # modifiée pour 30->150
+
+                dvx: float = total_velocity * math.sin(alpha)
+                dvy: float = total_velocity * math.cos(alpha)
+                ball.setVelocity(dvx, dvy)
+
+                # réajustement
+                ball.moveToCoordinates(Position2D(ball.getCenterPosition().getX(), self.getRaquette().getPosition().getY() - ball.getRadius()))
 
             # Collision avec les briques
             for brick in self.getBricks():

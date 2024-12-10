@@ -14,7 +14,7 @@ class Ball:
         self._hitbox: SolidCircle = SolidCircle(position=center, radius=radius)
 
         self._speed: float = speed
-        self._x_velocity: float = 1.0
+        self._x_velocity: float = 0.0
         self._y_velocity: float = 1.0
 
     def getCenterPosition(self) -> Position2D:
