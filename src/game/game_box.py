@@ -58,7 +58,6 @@ class GameBox:
         return self._raquette
 
 
-
     def tryMoveRaquette(self, p: Position2D) -> bool:
         rq: Raquette = self.getRaquette()
 

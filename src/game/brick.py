@@ -68,8 +68,8 @@ class Brick:
     def isBroken(self) -> bool:
         return self.getHP() <= 0
     
-    def getBrickValue(btype: BrickType) -> int:
-        match btype:
+    def getBrickValue(self) -> int:
+        match self.getBrickType():
             case BrickType.WHITE: return 50
             case BrickType.ORANGE: return 60
             case BrickType.CYAN: return 70

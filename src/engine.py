@@ -2,21 +2,20 @@
 
 
 from src.game.collision_helper import CollisionHelper
-from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.game_box import GameBox
 from src.game.brick import Brick
 
+from src.controller import GameController
 from src.common import Position2D, Action
 
 
 class GameEngine:
     
-
     @staticmethod
-    def _handle_inputs() -> Action:
-        return Action._NONE
+    def _handle_inputs(controller: GameController) -> Action:
+        return controller.getUserAction()
 
     @staticmethod
     def _handle_actions(gamebox: GameBox, action: Action) -> bool:
@@ -59,7 +58,7 @@ class GameEngine:
 
         # Puis on applique les collisions avec les murs / briques
         gamebox.checkCollisionsWithWalls()
-        bricks_hit: list[SolidRectangle] = gamebox.checkCollisionsWithRaquetteAndBricks()
+        bricks_hit: list[Brick] = gamebox.checkCollisionsWithRaquetteAndBricks()
         return bricks_hit
     
     @staticmethod
@@ -81,10 +80,10 @@ class GameEngine:
         return total_reward
 
     @staticmethod
-    def handle_routine(gamebox: GameBox) -> None:
+    def handle_routine(gamebox: GameBox, controller: GameController) -> None:
 
         # Gestion des actions
-        player_action: Action = GameEngine._handle_inputs()
+        player_action: Action = GameEngine._handle_inputs(controller=controller)
         GameEngine._handle_actions(gamebox=gamebox, action=player_action)
 
         # Gestion des collisions (briques / balles / raquette)

@@ -1,6 +1,5 @@
 
 
-
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.game_box import GameBox
@@ -9,9 +8,7 @@ from src.game.brick import Brick
 from src.common import Position2D, BrickType
 from src.gui.gui import GameGUI
 from src.engine import GameEngine
-
-
-
+from src.controller import GameController
 
 
 
@@ -29,10 +26,11 @@ if __name__ == "__main__":
         bricks=[Brick(Position2D(50, 50), 60, 20, BrickType.CYAN), Brick(Position2D(200, 50), 60, 20, BrickType.SILVER)]
     )
 
+    controller: GameController = GameController(config=None)
     gui: GameGUI = GameGUI(gamebox)
 
     def mainloop():
-        GameEngine.handle_routine(gamebox=gamebox)
+        GameEngine.handle_routine(gamebox=gamebox, controller=controller)
         gui.update_gui()
         gui.after(16, mainloop)
 
