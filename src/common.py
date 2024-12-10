@@ -17,10 +17,10 @@ class Position2D:
         return self._y
     
     def coords(self) -> tuple[float, float]:
-        return self.x, self.y
+        return self.getX(), self.getY()
 
     def __repr__(self) -> str:
-        return f'{self.coords}'
+        return f'{self.coords()}'
     
 
 class BrickType(Enum):

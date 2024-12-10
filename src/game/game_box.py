@@ -6,14 +6,11 @@ from src.game.ball import Ball
 from src.game.raquette import Raquette
 
 from src.common import Position2D
-import itertools
-
 
 
 class GameBox:
 
     def __init__(self, position: Position2D, width: float, height: float, balls: list[Ball], raquette: Raquette) -> None:
-
         self._position: Position2D = position
         self._width: float = width
         self._height: float = height
@@ -58,51 +55,83 @@ class GameBox:
     def getRaquette(self) -> Raquette:
         return self._raquette
 
-    def isOutOfBounds(self, entity: SolidInterface) -> bool:
 
-        if isinstance(entity, SolidRectangle):
-            rect: SolidRectangle = entity
-            return (
-                rect.getPosition().getX() < self.getPosition().getX() or
-                rect.getPosition().getY() < self.getPosition().getY() or
-                rect.getPosition().getX() + rect.getWidth() > self.getPosition().getX() + self.getWidth() or
-                rect.getPosition().getY() + rect.getHeight() > self.getPosition().getY() + self.getHeight()
+
+
+
+    def tryMoveRaquette(self, p: Position2D) -> bool:
+        rq: Raquette = self.getRaquette()
+
+        # Si la raquette n'est pas out of bound ;
+        can_move: bool = (
+            self.getPosition().getX() <= p.getX() and \
+            self.getPosition().getY() <= p.getY() and \
+            self.getPosition().getX() + self.getWidth() >= p.getX() + rq.getWidth() and \
+            self.getPosition().getY() + self.getHeight() >= p.getY() + rq.getHeight()
+        )
+
+        # On déplace la raquette si possible
+        if can_move: rq.moveToCoordinates(c=p)
+        return can_move
+
+    def tryMoveBalls(self, p_vec: list[Position2D]) -> list[bool]:
+        balls: list[Ball] = self.getBalls()
+
+        can_move: list[bool] = [
+            (
+                self.getPosition().getX() <= p.getX() - ball.getRadius() and \
+                self.getPosition().getY() <= p.getY() - ball.getRadius() and \
+                self.getPosition().getX() + self.getWidth() >= p.getX() + ball.getRadius() and \
+                self.getPosition().getY() + self.getHeight() >= p.getY() + ball.getRadius()
             )
+            for p, ball in zip(p_vec, balls)
+        ]
+
+        # Déplacer les balles si possible
+        for p, flag, ball in zip(p_vec, can_move, balls):
+            if flag: ball.moveToCoordinates(c=p)
+
+        return can_move
+
+    def checkCollisionsWithWalls(self) -> None:
         
-        elif isinstance(entity, SolidCircle):
-            circle = entity
-            return (
-                circle.getPosition().getX() - circle.getRadius() < self.getPosition().getX() or
-                circle.getPosition().getY() - circle.getRadius() < self.getPosition().getY() or
-                circle.getPosition().getX() + circle.getRadius() > self.getPosition().getX() + self.getWidth() or
-                circle.getPosition().getY() + circle.getRadius() > self.getPosition().getY() + self.getHeight()
-            )
+        # Pour chacune des balls, on applique un check de collision.
+        for ball in self.getBalls():
+            
+            ball_pos: Position2D = ball.getCenterPosition()
+            ball_radius: float = ball.getRadius()
+            vx, vy = ball.getVelocity()
+
+            # Mur gauche
+            if ball_pos.getX() - ball_radius <= self.getPosition().getX() and vx < 0: ball.setVelocity(-vx, vy)
+            # Mur droit
+            elif ball_pos.getX() + ball_radius >= self.getPosition().getX() + self.getWidth() and vx > 0: ball.setVelocity(-vx, vy)
+            # Mur haut
+            if ball_pos.getY() - ball_radius <= self.getPosition().getY() and vy < 0: ball.setVelocity(vx, -vy)
+            # Mur bas
+            elif ball_pos.getY() + ball_radius >= self.getPosition().getY() + self.getHeight() and vy > 0: ball.setVelocity(vx, -vy)
+
+            else: pass
+
+    def checkCollisionsWithRaquetteAndBricks(self) -> list[SolidRectangle]:
         
-        else: raise NotImplementedError(f"[e] Unknown entity type for isOutOfBounds. (e={entity})")
+        bricks_hit: list[SolidRectangle] = list()
 
-
-
-    def checkCollisionsWithEntities(self) -> list[SolidInterface]:
-
-        colliding_entities: list[SolidInterface] = []
- 
-        # On regarde si une entité collide avec la raquette
-        for entity in self.getEntities():
-            if CollisionHelper.isColliding(self.getRaquette().getHitbox(), entity):
-                colliding_entities.append(entity)
-        
-        return colliding_entities
+        for ball in self.getBalls():
     
-    def checkCollisionsWithBricks(self) -> list[SolidInterface]:
+            vx, vy = ball.getVelocity()
 
-        colliding_bricks: list[SolidInterface] = []
- 
-        # On regarde si une brique collide avec une balle
-        for brick in self.getEntities():
-            for ball in self.getBalls():
+            # Collision avec la raquette
+            if CollisionHelper.isColliding(ball.getHitbox(), self.getRaquette().getHitbox()):
+                ball.setVelocity(vx, -vy)
 
-                if CollisionHelper.isColliding(ball.getHitbox(), brick):
-                    colliding_bricks.append(brick)
-        
-        return colliding_bricks
+            # Collision avec les briques
+            for brick in self.getBricks():
+                if CollisionHelper.isColliding(ball.getHitbox(), brick) and brick not in bricks_hit:
+                    ball.setVelocity(-vx, -vy)
+                    bricks_hit.append(brick)
 
+        return bricks_hit
+                    
+                    
+            
