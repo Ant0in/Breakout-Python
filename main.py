@@ -3,13 +3,18 @@ from src.game.game_box import GameBox
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
-from src.player.score import Score
 from src.game.bonus import DuplicationBonus
 
-from src.common import Position2D, BrickType
-from src.gui.gui import GameGUI
-from src.engine import GameEngine
+from src.player.player import Player
+from src.player.score import Score
 from src.player.controller import GameController
+
+from src.gui.gui import GameGUI
+
+from src.engine import GameEngine
+
+from src.common import Position2D, BrickType
+
 
 
 if __name__ == "__main__":
@@ -31,12 +36,11 @@ if __name__ == "__main__":
         ]
     )
 
-    score: Score = Score(init_val=0)
-    controller: GameController = GameController(config=None)
+    player: Player = Player(controller=None, score=None, bonus=None)
     gui: GameGUI = GameGUI(gamebox)
 
     def mainloop():
-        GameEngine.handle_routine(gamebox=gamebox, controller=controller, score=score)
+        GameEngine.handle_routine(gamebox=gamebox, player=player)
         gui.update_gui()
         gui.after(16, mainloop)
 

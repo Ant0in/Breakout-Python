@@ -4,10 +4,12 @@ from src.game.game_box import GameBox
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
-from src.player.score import Score
 from src.game.bonus import BonusInterface
 
+from src.player.player import Player
+from src.player.score import Score
 from src.player.controller import GameController
+
 from src.common import Position2D, Action
 
 
@@ -91,16 +93,16 @@ class GameEngine:
         ...
 
     @staticmethod
-    def handle_routine(gamebox: GameBox, controller: GameController, score: Score) -> None:
+    def handle_routine(gamebox: GameBox, player: Player) -> None:
 
         # Gestion des actions
-        player_action: Action = GameEngine._handle_inputs(controller=controller)
+        player_action: Action = GameEngine._handle_inputs(controller=player.getController())
         GameEngine._handle_actions(gamebox=gamebox, action=player_action)
 
         # Gestion des collisions (briques / balles / raquette) et du score
         bricks_hit: list[Brick] = GameEngine._handle_balls(gamebox=gamebox)
         reward: int = GameEngine._handle_brick_destruction(gamebox=gamebox, bricks=bricks_hit)
-        score.addScore(increment=reward)
+        player.getScore().addScore(increment=reward)
 
         # Gestion des bonus (utilisation bonus / collision bonus (pickup) / fin d'un bonus actif)
         GameEngine._handle_bonuses(gamebox=gamebox)
