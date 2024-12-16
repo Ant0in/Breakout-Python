@@ -18,6 +18,7 @@ class GameController:
         return self._config
 
     def getUserAction(self) -> Action:
+        
         # Pour chaque key, on va vérifier si le player l'appuie (polling)
         for k, a in self.getConfig().items():
             if keyboard.is_pressed(k): return a

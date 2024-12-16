@@ -5,6 +5,7 @@ from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
+from src.game.bonus import BonusInterface
 
 from src.common import Position2D
 import math
@@ -14,7 +15,8 @@ import math
 class GameBox:
 
     def __init__(self, position: Position2D, width: float, height: float,
-                 balls: list[Ball], raquette: Raquette, bricks: list[Brick] | None = None, entities: list[SolidInterface] | None = None) -> None:
+                 balls: list[Ball], raquette: Raquette, bricks: list[Brick] | None = None, entities: list[BonusInterface] | None = None) -> None:
+        
         self._position: Position2D = position
         self._width: float = width
         self._height: float = height
@@ -22,7 +24,7 @@ class GameBox:
         self._balls: list[Ball] = balls
         self._raquette: Raquette = raquette
         self._bricks: list[Brick] = bricks if bricks else list()
-        self._entities: list[SolidInterface] = entities if entities else list()
+        self._entities: list[BonusInterface] = entities if entities else list()
 
     def getPosition(self) -> Position2D:
         return self._position
@@ -33,14 +35,14 @@ class GameBox:
     def getHeight(self) -> float:
         return self._height
 
-    def getEntities(self) -> list[SolidInterface]:
+    def getEntities(self) -> list[BonusInterface]:
         return self._entities
 
-    def addEntity(self, entity: SolidInterface) -> None:
+    def addEntity(self, entity: BonusInterface) -> None:
         self.getEntities().append(entity)
 
-    def removeEntity(self, entity: SolidInterface) -> None:
-        entities: list[SolidInterface] = self.getEntities()
+    def removeEntity(self, entity: BonusInterface) -> None:
+        entities: list[BonusInterface] = self.getEntities()
         if entity in entities: entities.remove(entity)
 
     def getBricks(self) -> list[Brick]:
@@ -56,9 +58,11 @@ class GameBox:
     def getBalls(self) -> list[Ball]:
         return self._balls
     
+    def addBall(self, b: Ball) -> None:
+        self.getBalls().append(b)
+    
     def getRaquette(self) -> Raquette:
         return self._raquette
-
 
     def tryMoveRaquette(self, p: Position2D) -> bool:
         rq: Raquette = self.getRaquette()
@@ -148,4 +152,25 @@ class GameBox:
 
         return bricks_hit
                     
-                    
+    def checkCollisionWithEntities(self) -> list[BonusInterface]:
+
+        collected_bonuses: list[BonusInterface] = list()
+        rq: Raquette = self.getRaquette()
+
+        for entity in self.getEntities():
+            
+            # on move l'entité, puis on check si elle est en collision avec la raquette
+            falling_pos: Position2D = entity.getGravityPosition()
+            entity.moveToCoords(p=falling_pos)
+
+            if CollisionHelper.isColliding(entity.getHitbox(), rq.getHitbox()):
+                collected_bonuses.append(entity)
+                self.removeEntity(entity=entity)
+
+            # TODO : Sinon, on vérifie si elle ne sort pas de l'écran. Auquel cas, on peut la détruire.
+            else:
+                ...
+        
+        return collected_bonuses
+
+

@@ -3,13 +3,13 @@ from src.game.game_box import GameBox
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
-from src.game.score import Score
+from src.player.score import Score
 from src.game.bonus import DuplicationBonus
 
 from src.common import Position2D, BrickType
 from src.gui.gui import GameGUI
 from src.engine import GameEngine
-from src.controller import GameController
+from src.player.controller import GameController
 
 
 if __name__ == "__main__":

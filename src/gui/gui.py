@@ -6,22 +6,10 @@ import time
 
 from src.game.solid_shapes import SolidRectangle, SolidCircle
 from src.game.game_box import GameBox
-from src.common import BrickType
+from src.common import BrickType, BRICK_COLORS
 
 
-BRICK_COLORS: dict = {
-    BrickType._NONE: "#000000",
-    BrickType.WHITE: "#FFFFFF",  # Blanc
-    BrickType.ORANGE: "#FFA500",  # Orange
-    BrickType.CYAN: "#00FFFF",   # Cyan
-    BrickType.GREEN: "#008000",  # Vert
-    BrickType.RED: "#FF0000",    # Rouge
-    BrickType.BLUE: "#0000FF",   # Bleu
-    BrickType.MAGENTA: "#FF00FF", # Magenta
-    BrickType.YELLOW: "#FFFF00", # Jaune
-    BrickType.SILVER: "#C0C0C0", # Argent
-    BrickType.GOLD: "#FFD700",   # Or
-}
+
 
 
 
