@@ -85,6 +85,7 @@ class BonusInterface(ABC):
     
     @abstractmethod
     def applyLogic(self) -> any:
+        # TODO : Implement logic for each bonuses that inherits from the interface
         raise NotImplementedError()
 
 
@@ -92,13 +93,17 @@ class DuplicationBonus(BonusInterface):
     
     def __init__(self, pos: Position2D) -> None:
         
-        super().__init__(pos=pos, size=BONUS_SIZE, active_duration=1,
-            falling_speed=BONUS_FALLING_SPEED, is_active=False, is_spawned=False)
+        # super init from interface for duplication bonus
+        super().__init__(pos=pos,
+            size=BONUS_SIZE, active_duration=1,
+            falling_speed=BONUS_FALLING_SPEED,
+            is_active=False, is_spawned=False)
         
     def applyLogic(self) -> None:
 
-        # 
+        # is bonus is not active or has expired, we skip logic
         if not self.isActive() or self.hasBonusDurationExpired():
-            return
+            return ...
         
+
 
