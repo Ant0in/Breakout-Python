@@ -1,7 +1,9 @@
 
 
 from src.common import Action
+
 import keyboard
+
 
 
 class GameController:

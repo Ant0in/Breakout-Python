@@ -1,4 +1,5 @@
 
+
 from enum import Enum
 
 
@@ -21,7 +22,6 @@ class Position2D:
     def __repr__(self) -> str:
         return f'{self.coords()}'
     
-
 class BrickType(Enum):
     _NONE       = 0
     WHITE       = 1
@@ -34,6 +34,20 @@ class BrickType(Enum):
     YELLOW      = 8
     SILVER      = 9
     GOLD        = 10
+
+class Action(Enum):
+    _NONE = 0
+    LEFT = 1
+    RIGHT = 2
+
+class WallType(Enum):
+    _NONE = 0
+    LEFT = 1
+    RIGHT = 2
+    BOTTOM = 3
+    TOP = 4
+
+
 
 BRICK_COLORS: dict = {
     BrickType._NONE: "#000000",         # - filler -
@@ -50,14 +64,10 @@ BRICK_COLORS: dict = {
 }
 
 
-class Action(Enum):
-    _NONE = 0
-    LEFT = 1
-    RIGHT = 2
 
-
-
+BOX_WALLS_THICKNESS: float = 10.0
 GAME_FRAMERATE: int = 60
 BONUS_SIZE: float = 10.0
 BONUS_FALLING_SPEED: float = 10.0
 INFINITY: float = float('inf')
+

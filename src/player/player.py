@@ -2,6 +2,7 @@
 
 from src.player.score import Score
 from src.player.controller import GameController
+
 from src.game.bonus import BonusInterface
 
 
@@ -23,4 +24,10 @@ class Player:
     
     def getBonus(self) -> list[BonusInterface]:
         return self._bonus
+    
+    def addBonus(self, b: BonusInterface) -> None:
+        self.getBonus().append(b)
+
+    def removeBonus(self, b: BonusInterface) -> None:
+        if b in self.getBonus(): self.getBonus().remove(b)
 

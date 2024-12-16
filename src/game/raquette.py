@@ -1,7 +1,8 @@
 
 
-from src.game.solid_shapes import SolidRectangle
-from src.common import Position2D
+from src.engine.solid_shapes import SolidRectangle
+
+from src.common import Position2D, Action
 
 
 
@@ -52,4 +53,17 @@ class Raquette:
         self.setPosition(p=c)
         self.getHitbox().setPosition(p=c)
 
+    def calculateNewPosition(self, action: Action) -> Position2D:
 
+        _x: float = self.getPosition().getX()
+        _y: float = self.getPosition().getY()
+        sensibility: float = self.getSensibility()
+        
+        match action:
+            
+            case Action.LEFT: return Position2D(_x - sensibility, _y)
+            case Action.RIGHT: return Position2D(_x + sensibility, _y)
+            case Action._NONE: return Position2D(_x, _y)
+            
+            case _: raise NotImplementedError()
+    

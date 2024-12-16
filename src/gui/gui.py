@@ -1,15 +1,13 @@
 
 
+from src.game.game_box import GameBox
+
+from src.engine.solid_shapes import SolidRectangle, SolidCircle
+
+from src.common import BRICK_COLORS
+
 import tkinter as tk
 import time
-
-
-from src.game.solid_shapes import SolidRectangle, SolidCircle
-from src.game.game_box import GameBox
-from src.common import BrickType, BRICK_COLORS
-
-
-
 
 
 
@@ -35,7 +33,6 @@ class GameGUI(tk.Tk):
         for brick in self.gamebox.getBricks(): self.draw_rectangle(brick, fill=BRICK_COLORS[brick.getBrickType()])
         self.update_fps()
 
-
     def update_fps(self):
         current = time.time()
         delta = current - self.lastupdate
@@ -43,8 +40,6 @@ class GameGUI(tk.Tk):
         self.lastupdate = current
         self.title(f'Arkanoid Python - {round(fps)} FPS')
 
-
-    
     def draw_rectangle(self, rect: SolidRectangle, fill: str) -> None:
         x1: float = rect.getPosition().getX()
         y1: float = rect.getPosition().getY()
@@ -57,5 +52,4 @@ class GameGUI(tk.Tk):
         y: float = circle.getPosition().getY()
         r: float = circle.getRadius()
         self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=fill)
-
 

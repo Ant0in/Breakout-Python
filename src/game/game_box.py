@@ -1,14 +1,14 @@
 
 
-from src.game.collision_helper import CollisionHelper
-from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
 from src.game.bonus import BonusInterface
 
-from src.common import Position2D
-import math
+from src.engine.collision_helper import CollisionHelper
+from src.engine.solid_shapes import SolidInterface, SolidRectangle
+
+from src.common import Position2D, WallType, BOX_WALLS_THICKNESS
 
 
 
@@ -20,11 +20,25 @@ class GameBox:
         self._position: Position2D = position
         self._width: float = width
         self._height: float = height
-
+        self._hitbox: SolidRectangle = SolidRectangle(position=position, height=height, width=width)
+        
         self._balls: list[Ball] = balls
         self._raquette: Raquette = raquette
         self._bricks: list[Brick] = bricks if bricks else list()
         self._entities: list[BonusInterface] = entities if entities else list()
+
+        self._initializeWalls()
+
+    def _initializeWalls(self) -> None:
+
+        p: Position2D = self.getPosition()
+        w: float = self.getWidth()
+        h: float = self.getHeight()
+        
+        self._leftWall: SolidRectangle = SolidRectangle(position=Position2D(p.getX() - BOX_WALLS_THICKNESS, p.getY()), height=h, width=BOX_WALLS_THICKNESS)
+        self._rightWall: SolidRectangle = SolidRectangle(position=Position2D(p.getX() + w, p.getY()), height=h, width=BOX_WALLS_THICKNESS)
+        self._topWall: SolidRectangle = SolidRectangle(position=Position2D(p.getX(), p.getY() - BOX_WALLS_THICKNESS), height=BOX_WALLS_THICKNESS, width=w)
+        self._bottomWall: SolidRectangle = SolidRectangle(position=Position2D(p.getX(), p.getY() + h), height=BOX_WALLS_THICKNESS, width=w)
 
     def getPosition(self) -> Position2D:
         return self._position
@@ -34,6 +48,9 @@ class GameBox:
 
     def getHeight(self) -> float:
         return self._height
+
+    def getHitbox(self) -> SolidRectangle:
+        return self._hitbox
 
     def getEntities(self) -> list[BonusInterface]:
         return self._entities
@@ -64,113 +81,87 @@ class GameBox:
     def getRaquette(self) -> Raquette:
         return self._raquette
 
-    def tryMoveRaquette(self, p: Position2D) -> bool:
-        rq: Raquette = self.getRaquette()
 
-        # Si la raquette n'est pas out of bound ;
-        can_move: bool = (
-            self.getPosition().getX() <= p.getX() and \
-            self.getPosition().getY() <= p.getY() and \
-            self.getPosition().getX() + self.getWidth() >= p.getX() + rq.getWidth() and \
-            self.getPosition().getY() + self.getHeight() >= p.getY() + rq.getHeight()
-        )
+    # -------------------------- #
 
-        # On déplace la raquette si possible
-        if can_move: rq.moveToCoordinates(c=p)
-        return can_move
 
-    def tryMoveBalls(self, p_vec: list[Position2D]) -> list[bool]:
+    def getLeftWall(self) -> SolidRectangle:
+        return self._leftWall
+    
+    def getRightWall(self) -> SolidInterface:
+        return self._rightWall
+    
+    def getBottomWall(self) -> SolidInterface:
+        return self._bottomWall
+    
+    def getTopWall(self) -> SolidInterface:
+        return self._topWall
+
+    def isPositionOutOfBounds(self, pos: Position2D) -> bool:
+        # Checks if a position is contained within the GameBox.
+        # If it isn't the case, then the position is out of bounds. -> returns True
+        isPointContainedInGameBox: bool = self.getHitbox().isPointInSolid(point=pos)
+        return (not isPointContainedInGameBox)
+
+    def isObjectOutOfBounds(self, object: Raquette | Ball | BonusInterface) -> bool:
+        
+        # Checks if an 'object' (which has a SolidInterface) is colliding with the GameBox.
+        # If it isn't the case, then the 'object' is out of bounds. -> returns True
+        outOfBounds: bool = (not CollisionHelper.isColliding(self.getHitbox(), object.getHitbox()))
+        return outOfBounds
+
+    def isObjectCollidingWithWalls(self, object: Raquette | Ball | BonusInterface) -> None | WallType:
+        
+        # On fait une méthode qui vérifira si un objet collide avec un mur. Si c'est le cas, on return le mur.
+        # Sinon, on ne return rien.
+        if CollisionHelper.isColliding(object.getHitbox(), self.getLeftWall()): return WallType.LEFT
+        elif CollisionHelper.isColliding(object.getHitbox(), self.getRightWall()): return WallType.RIGHT
+        elif CollisionHelper.isColliding(object.getHitbox(), self.getTopWall()): return WallType.TOP
+        elif CollisionHelper.isColliding(object.getHitbox(), self.getBottomWall()): return WallType.BOTTOM
+        
+        else: return None
+
+    def tryMoveRaquette(self, pos: Position2D) -> bool:
+        
+        # On essaye de move la raquette en regardant si collision avec les murs.
+
+        # None -> Pas de collision.
+        if self.isObjectCollidingWithWalls(object=self.getRaquette()) is None:
+            self.getRaquette().moveToCoordinates(c=pos)
+            return True
+        
+        # WallType -> Collision.
+        else: return False
+
+    def tryMoveBalls(self) -> list[bool]:
         
         balls: list[Ball] = self.getBalls()
+        could_move: bool = [False for _ in range(len(balls))]
 
-        can_move: list[bool] = [
-            (
-                self.getPosition().getX() < p.getX() < self.getPosition().getX() + self.getWidth() and \
-                self.getPosition().getY() < p.getY() < self.getPosition().getY() + self.getHeight()
-            ) for p in p_vec]
-
-        # Déplacer les balles si possible
-        for p, flag, ball in zip(p_vec, can_move, balls):
-            if flag: ball.moveToCoordinates(c=p)
-            else: ball.moveToCoordinates(c=p)
-
-        return can_move
-
-    def checkCollisionsWithWalls(self) -> None:
-        
-        for ball in self.getBalls():
+        for idx, ball in enumerate(balls):
             
-            ball_pos: Position2D = ball.getCenterPosition()
-            ball_radius: float = ball.getRadius()
-            vx, vy = ball.getVelocity()
-
-            # Mur gauche
-            if ball_pos.getX() - ball_radius <= self.getPosition().getX() and vx < 0:
-                ball.setVelocity(-vx, vy)
-                ball.moveToCoordinates(Position2D(self.getPosition().getX() + ball_radius, ball_pos.getY()))
-            # Mur droit
-            elif ball_pos.getX() + ball_radius >= self.getPosition().getX() + self.getWidth() and vx > 0:
-                ball.setVelocity(-vx, vy)
-                ball.moveToCoordinates(Position2D(self.getPosition().getX() + self.getWidth() - ball_radius, ball_pos.getY()))
-            # Mur haut
-            if ball_pos.getY() - ball_radius <= self.getPosition().getY() and vy < 0:
-                ball.setVelocity(vx, -vy)
-                ball.moveToCoordinates(Position2D(ball_pos.getX(), self.getPosition().getY() + ball_radius))
-            # Mur bas
-            elif ball_pos.getY() + ball_radius >= self.getPosition().getY() + self.getHeight() and vy > 0:
-                ball.setVelocity(vx, -vy)
-                ball.moveToCoordinates(Position2D(ball_pos.getX(), self.getPosition().getY() + self.getHeight() - ball_radius))
-
-    def checkCollisionsWithRaquetteAndBricks(self) -> list[Brick]:
-        
-        bricks_hit: list[Brick] = list()
-
-        for ball in self.getBalls():
-    
-            vx, vy = ball.getVelocity()
-
-            # Collision avec la raquette
-            if CollisionHelper.isColliding(ball.getHitbox(), self.getRaquette().getHitbox()):
-
-                total_velocity: float = math.sqrt((vx**2 + vy**2))
-                L: float = self.getRaquette().getWidth()
-                x: float = ball.getCenterPosition().getX() - self.getRaquette().calculateCenterPosition().getX()
-                alpha: float = (math.pi / 6) + ((5 * math.pi) / 6) * (1 - (x / L))  # modifiée pour 30->150
-
-                dvx: float = total_velocity * math.sin(alpha)
-                dvy: float = total_velocity * math.cos(alpha)
-                ball.setVelocity(dvx, dvy)
-
-                # réajustement
-                ball.moveToCoordinates(Position2D(ball.getCenterPosition().getX(), self.getRaquette().getPosition().getY() - ball.getRadius()))
-
-            # Collision avec les briques
-            for brick in self.getBricks():
-                if CollisionHelper.isColliding(ball.getHitbox(), brick.getHitbox()) and brick not in bricks_hit:
-                    ball.setVelocity(-vx, -vy)
-                    bricks_hit.append(brick)
-
-        return bricks_hit
-                    
-    def checkCollisionWithEntities(self) -> list[BonusInterface]:
-
-        collected_bonuses: list[BonusInterface] = list()
-        rq: Raquette = self.getRaquette()
-
-        for entity in self.getEntities():
+            np: Position2D = ball.calculateNewPosition()
+            temp: Ball = Ball(center=np, radius=ball.getRadius(), speed=ball.getSpeed())
             
-            # on move l'entité, puis on check si elle est en collision avec la raquette
-            falling_pos: Position2D = entity.getGravityPosition()
-            entity.moveToCoords(p=falling_pos)
+            wallCollision: WallType | None = self.isObjectCollidingWithWalls(object=temp)
+            
+            # Si aucune wall collision alors on peut move la vraie balle
+            if wallCollision is None:
+                ball.moveToCoordinates(c=np)
+                could_move[idx] = True
 
-            if CollisionHelper.isColliding(entity.getHitbox(), rq.getHitbox()):
-                collected_bonuses.append(entity)
-                self.removeEntity(entity=entity)
-
-            # TODO : Sinon, on vérifie si elle ne sort pas de l'écran. Auquel cas, on peut la détruire.
+            # Sinon, on va modifier le vecteur de vélocité de la balle selon
+            # le mur touché.
             else:
-                ...
-        
-        return collected_bonuses
+                could_move[idx] = False
+                vx, vy = ball.getVelocity()
+
+                match wallCollision:
+                    case WallType.LEFT: ball.setVelocity(-vx, vy)
+                    case WallType.RIGHT: ball.setVelocity(-vx, vy)
+                    case WallType.TOP: ball.setVelocity(vx, -vy)
+                    case WallType.BOTTOM: ...  # TODO : GameOver ?
+
+        return could_move
 
 

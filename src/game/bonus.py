@@ -1,12 +1,14 @@
 
 
-from abc import ABC, abstractmethod
+from src.game.ball import Ball
+
+from src.engine.solid_shapes import SolidRectangle
+
 from src.common import *
+
+from abc import ABC, abstractmethod
 import math
 
-
-from src.game.solid_shapes import SolidRectangle
-from src.game.ball import Ball
 
 
 class BonusInterface(ABC):
@@ -131,7 +133,7 @@ class DuplicationBonus(BonusInterface):
 
         gb.addBall(b=b1)
         gb.addBall(b=b2)
-        
+
         # decrement TTL (for dupe, 1 logic cycle will be applied since it has TTL of 1)
         self.incrementDuration(incr=-1)
 

@@ -1,7 +1,8 @@
 
 
+from src.engine.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
+
 from src.common import Position2D
-from src.game.solid_shapes import SolidInterface, SolidCircle, SolidRectangle
 
 
 
