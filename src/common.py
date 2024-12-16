@@ -2,7 +2,6 @@
 from enum import Enum
 
 
-
 class Position2D:
 
     def __init__(self, x: float, y: float) -> None:
@@ -42,3 +41,9 @@ class Action(Enum):
     LEFT = 1
     RIGHT = 2
 
+
+
+GAME_FRAMERATE: int = 60
+BONUS_SIZE: float = 10.0
+BONUS_FALLING_SPEED: float = 10.0
+INFINITY: float = float('inf')

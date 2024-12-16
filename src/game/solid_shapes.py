@@ -27,14 +27,20 @@ class SolidRectangle(SolidInterface):
     def getHeight(self) -> float:
         return self._height
     
+    def setHeight(self, h: float) -> None:
+        self._height = h
+    
     def getWidth(self) -> float:
         return self._width
     
+    def setWidth(self, w: float) -> None:
+        self._width = w
+
     def getCorners(self) -> list[Position2D]:
         top_left: Position2D = self.getPosition()
         top_right: Position2D = Position2D(top_left.getX() + self.getWidth(), top_left.getY())
-        bottom_left: Position2D = Position2D(top_left.getX(), top_left.getY() + self.getHeight())
-        bottom_right: Position2D = Position2D(top_left.getX() + self.getWidth(), top_left.getY() + self.getHeight())
+        bottom_left: Position2D = Position2D(top_left.getX(), top_left.getY() - self.getHeight())
+        bottom_right: Position2D = Position2D(top_left.getX() + self.getWidth(), top_left.getY() - self.getHeight())
         return [top_left, top_right, bottom_left, bottom_right]
 
     def isPointInSolid(self, point: Position2D) -> bool:

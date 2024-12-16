@@ -4,6 +4,7 @@ from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
 from src.game.score import Score
+from src.game.bonus import DuplicationBonus
 
 from src.common import Position2D, BrickType
 from src.gui.gui import GameGUI
