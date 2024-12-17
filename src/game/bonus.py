@@ -17,33 +17,33 @@ class BonusInterface(ABC):
     def __init__(self, pos: Position2D, size: float, active_duration: int, falling_speed: float,
                  is_active: bool = False, is_spawned: bool = False) -> None:
         
-        self._pos: Position2D = pos
-        self._size: float = size
-        self._activeDuration: int = active_duration
-        self._fallingSpeed: float = falling_speed
-        
+
         # let's use a square shape for bonuses (size x size)
         self._hitbox: SolidRectangle = SolidRectangle(position=pos, height=size, width=size)
+        
+        self._activeDuration: int = active_duration
+        self._fallingSpeed: float = falling_speed
         
         # and then flags, for some reason
         self._isSpawned: bool = is_spawned
         self._isActive: bool = is_active
-        
-
-    def getSize(self) -> float:
-        return self._size
-
-    def setSize(self, s: float) -> None:
-        self._size = s
-
-    def getPosition(self) -> Position2D:
-        return self._pos
-    
-    def setPosition(self, p: Position2D) -> None:
-        self._pos = p
 
     def getHitbox(self) -> SolidRectangle:
         return self._hitbox
+            
+    def getSize(self) -> float:
+        assert (self.getHitbox().getHeight() == self.getHitbox().getWidth())
+        return self.getHitbox().getHeight()  # arbitrarily returning height
+
+    def setSize(self, s: float) -> None:
+        self.getHitbox().setHeight(h=s)
+        self.getHitbox().setWidth(w=s)
+
+    def getPosition(self) -> Position2D:
+        return self.getHitbox().getPosition()
+    
+    def setPosition(self, p: Position2D) -> None:
+        self.getHitbox().setPosition(p=p)
 
     def isSpawned(self) -> bool:
         return self._isSpawned
@@ -72,12 +72,8 @@ class BonusInterface(ABC):
     def incrementDuration(self, incr: int) -> None:
         self.setDuration(d=(self.getDuration() + incr))
 
-    def moveToCoords(self, p: Position2D) -> None:
-        self.setPosition(p=p)
-        self.getHitbox().setPosition(p=p)
-
     def spawnBonus(self, p: Position2D) -> None:
-        self.moveToCoords(p=p)
+        self.setPosition(p=p)
         self.setSpawned(flag=True)
 
     def getGravityPosition(self) -> Position2D:
@@ -180,3 +176,4 @@ class ResizeBonus(BonusInterface):
 
         # decrement TTL (for player bonus, 1 logic cycle will be applied since it has TTL of 1)
         self.incrementDuration(incr=-1)
+

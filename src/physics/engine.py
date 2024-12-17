@@ -33,17 +33,17 @@ class GameEngine:
             # Si une collision arrive entre la balle et la raquette, on utilise la formule dans
             # les consignes. voir ./pdf/consignes.pdf
             if CollisionHelper.isColliding(ball.getHitbox(), gamebox.getRaquette().getHitbox()):
+
                 vx, vy = ball.getVelocity()
                 total_velocity: float = math.sqrt((vx**2 + vy**2))
                 L: float = gamebox.getRaquette().getWidth()
-                x: float = ball.getCenterPosition().getX() - gamebox.getRaquette().getHitbox().getCenterPosition().getX()
+                x: float = ball.getCenterPosition().getX() - gamebox.getRaquette().getCenterPosition().getX()
                 alpha: float = (math.pi / 6) + ((5 * math.pi) / 6) * (1 - (x / L))  # modifiée pour 30->150
                 dvx: float = total_velocity * math.sin(alpha)
                 dvy: float = total_velocity * math.cos(alpha)
-                ball.setVelocity(dvx, dvy)
-                ball.moveToCoordinates(Position2D(ball.getCenterPosition().getX(), gamebox.getRaquette().getPosition().getY() - ball.getRadius()))
 
-            else: ...
+                ball.setVelocity(dvx, dvy)
+                ball.setCenterPosition(p=Position2D(ball.getCenterPosition().getX(), gamebox.getRaquette().getPosition().getY() - ball.getRadius()))
 
     @staticmethod
     def _handleCollisionWithBricks(gamebox: GameBox) -> list[Brick]:
@@ -65,7 +65,7 @@ class GameEngine:
 
     @staticmethod
     def _calculateBonusSpawnPosition(brick: Brick, bonus: BonusInterface) -> Position2D:
-        brick_center: Position2D = brick.getHitbox().getCenterPosition()
+        brick_center: Position2D = brick.getCenterPosition()
         offset_center: Position2D = Position2D(brick_center.getX() - bonus.getSize() / 2, brick_center.getY() - bonus.getSize() / 2)
         return offset_center
 
@@ -82,7 +82,7 @@ class GameEngine:
                 # Si la brique contient un bonus ET que le joueur n'a qu'une seule balle, on le fait spawn
                 if brick.doesBrickContainsBonus() and not gamebox.doesPlayerHaveMutlipleBalls():
                     bonus: BonusInterface = brick.getBonus()
-                    gamebox.addEntity(entity=bonus)
+                    gamebox.addBonus(bonus=bonus)
                     bonus.spawnBonus(p=GameEngine._calculateBonusSpawnPosition(brick=brick, bonus=bonus))
 
                 # Puis on ajoute le score obtenu
@@ -112,23 +112,21 @@ class GameEngine:
     @staticmethod
     def _handleCollisionWithEntities(gamebox: GameBox, player: Player) -> None:
 
-        for entity in gamebox.getEntities():
+        for bonus in gamebox.getBonuses():
             
             # on move l'entité, puis on check si elle est en collision avec la raquette
-            falling_pos: Position2D = entity.getGravityPosition()
-            entity.moveToCoords(p=falling_pos)
+            falling_pos: Position2D = bonus.getGravityPosition()
+            bonus.setPosition(p=falling_pos)
 
             # On vérifie si tu récupères 
-            if CollisionHelper.isColliding(entity.getHitbox(), gamebox.getRaquette().getHitbox()):
-                player.addBonus(b=entity)
-                entity.setActive(flag=True)
-                gamebox.removeEntity(entity=entity)
+            if CollisionHelper.isColliding(bonus.getHitbox(), gamebox.getRaquette().getHitbox()):
+                player.addBonus(b=bonus)
+                bonus.setActive(flag=True)
+                gamebox.removeBonus(bonus=bonus)
 
             # Sinon, on vérifie si elle ne sort pas de l'écran. Auquel cas, on peut la détruire.
-            elif gamebox.isObjectOutOfBounds(object=entity):
-                gamebox.removeEntity(entity=entity)
-
-            else: ...
+            elif gamebox.isObjectOutOfBounds(object=bonus):
+                gamebox.removeBonus(bonus=bonus)
 
     @staticmethod
     def _handleBonusLogic(gamebox: GameBox, player: Player) -> None:
@@ -149,7 +147,7 @@ class GameEngine:
         
         # TODO : Faire une belle fonction de spawn fonctionnelle
         # TODO : qui gère proprement la remise de la balle en jeu.
-        center: Position2D = gamebox.getHitbox().getCenterPosition()
+        center: Position2D = gamebox.getCenterPosition()
         b: Ball = Ball(center=center, radius=BALL_RADIUS, speed=BALL_SPEED)
         gamebox.addBall(b=b)
 

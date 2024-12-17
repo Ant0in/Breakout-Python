@@ -26,7 +26,7 @@ class GameGUI(tk.Tk):
         self.draw_rectangle(self.gamebox.getRaquette().getHitbox(), fill="blue")
         for ball in self.gamebox.getBalls(): self.draw_circle(ball.getHitbox(), fill="red")
         for brick in self.gamebox.getBricks(): self.draw_rectangle(brick.getHitbox(), fill=BRICK_COLORS[brick.getBrickType()])
-        for bonus in self.gamebox.getEntities(): self.draw_rectangle(bonus.getHitbox(), fill='black')
+        for bonus in self.gamebox.getBonuses(): self.draw_rectangle(bonus.getHitbox(), fill='black')
         self.update_fps()
 
     def update_fps(self):

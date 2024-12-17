@@ -13,39 +13,39 @@ class Brick:
     def __init__(self, position: Position2D, width: float, height: float,
                  btype: BrickType, bonus: BonusInterface | None = None) -> None:
         
-        self._position: Position2D = position
-        self._width: float = width
-        self._height: float = height
+        self._hitbox: SolidRectangle = SolidRectangle(position=position, height=height, width=width)
+        
         self._btype: BrickType = btype
         self._bonus: BonusInterface | None = bonus
-
-        self._hitbox: SolidRectangle = SolidRectangle(position=position, height=height, width=width)
-        self._hp: float | int = self._attributeBrickHpByType(btype=btype)
+        self._hp: float | int = self._getBrickHpByType(btype=btype)
 
 
     @staticmethod
-    def _attributeBrickHpByType(btype: BrickType) -> int | float:
+    def _getBrickHpByType(btype: BrickType) -> int | float:
         hp: float | int | None = BRICK_HP.get(btype, None)
         if hp is not None: return hp
         else: raise NotImplementedError(f'[E] Error for brick type : {btype}')
 
+    def getHitbox(self) -> SolidRectangle:
+        return self._hitbox
+
     def getPosition(self) -> Position2D:
-        return self._position
+        return self.getHitbox().getPosition()
     
     def setPosition(self, p: Position2D) -> None:
-        self._position = p
+        self.getHitbox().setPosition(p=p)
 
     def getWidth(self) -> float:
-        return self._width
+        return self.getHitbox().getWidth()
     
     def setWidth(self, w: float) -> None:
-        self._width = w
+        self.getHitbox().setWidth(w=w)
 
     def getHeight(self) -> float:
-        return self._height
+        return self.getHitbox().getHeight()
     
     def setHeight(self, h: float) -> None:
-        self._height = h
+        self.getHitbox().setHeight(h=h)
 
     def getBrickType(self) -> BrickType:
         return self._btype
@@ -65,14 +65,6 @@ class Brick:
     def setHP(self, v: int | float) -> None:
         self._hp = v
 
-    def getHitbox(self) -> SolidRectangle:
-        return self._hitbox
-    
-    def moveToCoordinates(self, c: Position2D) -> None:
-        # On move la brique avec sa hitbox.
-        self.setPosition(p=c)
-        self.getHitbox().setPosition(p=c)
-
     def makeBrickLooseHP(self, loss: int) -> None:
         dhp: int | float = self.getHP() - loss
         self.setHP(v=dhp)
@@ -86,3 +78,6 @@ class Brick:
         if val is not None: return val
         else: raise NotImplementedError(f'[E] Unknown brick value for brick type : {val}')
 
+    def getCenterPosition(self) -> Position2D:
+        return self.getHitbox().getCenterPosition()
+    

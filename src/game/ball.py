@@ -10,8 +10,6 @@ class Ball:
 
     def __init__(self, center: Position2D, radius: float, speed: float = 1.0) -> None:
         
-        self._center: Position2D = center
-        self._radius: float = radius
         self._hitbox: SolidCircle = SolidCircle(position=center, radius=radius)
 
         self._speed: float = speed
@@ -19,21 +17,21 @@ class Ball:
         self._y_velocity: float = 1.0
         self._isAlive: bool = True
 
-    def getCenterPosition(self) -> Position2D:
-        return self._center
-    
-    def setCenterPosition(self, p: Position2D) -> None:
-        self._center = p
-
-    def getRadius(self) -> float:
-        return self._radius
-    
-    def setRadius(self, r: float) -> None:
-        self._radius = r
-
     def getHitbox(self) -> SolidCircle:
         return self._hitbox
     
+    def getCenterPosition(self) -> Position2D:
+        return self.getHitbox().getPosition()
+    
+    def setCenterPosition(self, p: Position2D) -> None:
+        self.getHitbox().setPosition(p=p)
+
+    def getRadius(self) -> float:
+        return self.getHitbox().getRadius()
+    
+    def setRadius(self, r: float) -> None:
+        self.getHitbox().setRadius(r=r)
+
     def getVelocity(self) -> tuple[float, float]:
         return self._x_velocity, self._y_velocity
     
@@ -52,11 +50,6 @@ class Ball:
     
     def setAlive(self, flag: bool) -> None:
         self._isAlive = flag
-
-    def moveToCoordinates(self, c: Position2D) -> None:
-        # On move la ball avec sa hitbox.
-        self.setCenterPosition(p=c)
-        self.getHitbox().setPosition(p=c)
 
     def calculateNewPosition(self) -> Position2D:
 

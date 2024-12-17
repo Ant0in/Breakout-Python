@@ -15,17 +15,15 @@ from src.common import Position2D, WallType, BrickType, BOX_WALLS_THICKNESS
 class GameBox:
 
     def __init__(self, position: Position2D, width: float, height: float,
-                 balls: list[Ball], raquette: Raquette, bricks: list[Brick] | None = None, entities: list[BonusInterface] | None = None) -> None:
+                 balls: list[Ball], raquette: Raquette, bricks: list[Brick] | None = None,
+                 bonuses: list[BonusInterface] | None = None) -> None:
         
-        self._position: Position2D = position
-        self._width: float = width
-        self._height: float = height
         self._hitbox: SolidRectangle = SolidRectangle(position=position, height=height, width=width)
         
         self._balls: list[Ball] = balls
         self._raquette: Raquette = raquette
         self._bricks: list[Brick] = bricks if bricks else list()
-        self._entities: list[BonusInterface] = entities if entities else list()
+        self._bonuses: list[BonusInterface] = bonuses if bonuses else list()
 
         self._initializeWalls()
 
@@ -40,27 +38,27 @@ class GameBox:
         self._topWall: SolidRectangle = SolidRectangle(position=Position2D(p.getX(), p.getY() - BOX_WALLS_THICKNESS), height=BOX_WALLS_THICKNESS, width=w)
         self._bottomWall: SolidRectangle = SolidRectangle(position=Position2D(p.getX(), p.getY() + h), height=BOX_WALLS_THICKNESS, width=w)
 
-    def getPosition(self) -> Position2D:
-        return self._position
-
-    def getWidth(self) -> float:
-        return self._width
-
-    def getHeight(self) -> float:
-        return self._height
-
     def getHitbox(self) -> SolidRectangle:
         return self._hitbox
 
-    def getEntities(self) -> list[BonusInterface]:
-        return self._entities
+    def getPosition(self) -> Position2D:
+        return self.getHitbox().getPosition()
 
-    def addEntity(self, entity: BonusInterface) -> None:
-        self.getEntities().append(entity)
+    def getWidth(self) -> float:
+        return self.getHitbox().getWidth()
 
-    def removeEntity(self, entity: BonusInterface) -> None:
-        entities: list[BonusInterface] = self.getEntities()
-        if entity in entities: entities.remove(entity)
+    def getHeight(self) -> float:
+        return self.getHitbox().getHeight()
+
+    def getBonuses(self) -> list[BonusInterface]:
+        return self._bonuses
+
+    def addBonus(self, bonus: BonusInterface) -> None:
+        self.getBonuses().append(bonus)
+
+    def removeBonus(self, bonus: BonusInterface) -> None:
+        bonuses: list[BonusInterface] = self.getBonuses()
+        if bonus in bonuses: bonuses.remove(bonus)
 
     def getBricks(self) -> list[Brick]:
         return self._bricks
@@ -85,7 +83,8 @@ class GameBox:
         self.getBalls().append(b)
 
     def removeBall(self, b: Ball) -> None:
-        if b in self.getBalls(): self.getBalls().remove(b)
+        balls: list[Ball] = self.getBalls()
+        if b in balls: balls.remove(b)
     
     def getRaquette(self) -> Raquette:
         return self._raquette
@@ -137,7 +136,7 @@ class GameBox:
 
         # None -> Pas de collision.
         if self.isObjectCollidingWithWalls(object=temp) is None:
-            self.getRaquette().moveToCoordinates(c=pos)
+            self.getRaquette().setPosition(p=pos)
             del temp
             return True
         
@@ -161,11 +160,13 @@ class GameBox:
 
         # Collision avec un seul mur (droit ou gauche).
         else:
+
             if collisionWithWall is WallType.LEFT:
-                temp.moveToCoordinates(c=Position2D(self.getPosition().getX(), temp.getPosition().getY()))
+                temp.setPosition(p=Position2D(self.getPosition().getX(), temp.getPosition().getY()))
             elif collisionWithWall is WallType.RIGHT:
-                temp.moveToCoordinates(c=Position2D(self.getPosition().getX() + self.getWidth() - temp.getWidth(), temp.getPosition().getY()))
+                temp.setPosition(p=Position2D(self.getPosition().getX() + self.getWidth() - temp.getWidth(), temp.getPosition().getY()))
             else: raise NotImplementedError()
+
             self.setRaquette(rq=temp)
 
     def tryMoveBalls(self) -> list[bool]:
@@ -182,7 +183,7 @@ class GameBox:
             
             # Si aucune wall collision alors on peut move la vraie balle
             if wallCollision is None:
-                ball.moveToCoordinates(c=np)
+                ball.setCenterPosition(p=np)
                 could_move[idx] = True
 
             # Sinon, on va modifier le vecteur de vélocité de la balle selon
