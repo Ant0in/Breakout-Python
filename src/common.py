@@ -3,6 +3,9 @@
 from enum import Enum
 
 
+INFINITY: float = float('inf')
+
+
 class Position2D:
 
     def __init__(self, x: float, y: float) -> None:
@@ -48,7 +51,6 @@ class WallType(Enum):
     TOP = 4
 
 
-
 BRICK_COLORS: dict = {
     BrickType._NONE: "#000000",         # - filler -
     BrickType.WHITE: "#FFFFFF",         # Blanc
@@ -63,7 +65,20 @@ BRICK_COLORS: dict = {
     BrickType.GOLD: "#FFD700",          # Or
 }
 
-INFINITY: float = float('inf')
+BRICK_HP: dict = {
+    BrickType._NONE: None,
+    BrickType.WHITE: 1,
+    BrickType.ORANGE: 1,
+    BrickType.CYAN: 1,
+    BrickType.GREEN: 1,
+    BrickType.RED: 1,
+    BrickType.BLUE: 1,
+    BrickType.MAGENTA: 1,
+    BrickType.YELLOW: 1,
+    BrickType.SILVER: 2,
+    BrickType.GOLD: INFINITY
+}
+
 
 GAME_FRAMERATE: int = 60
 

@@ -4,7 +4,7 @@ from src.game.bonus import BonusInterface
 
 from src.physics.solid_shapes import SolidRectangle
 
-from src.common import Position2D, BrickType
+from src.common import Position2D, BrickType, BRICK_HP
 
 
 
@@ -25,10 +25,7 @@ class Brick:
 
     @staticmethod
     def _attributeBrickHpByType(btype: BrickType) -> int | float:
-        match btype:
-            case BrickType.GOLD: return float('inf')
-            case BrickType.SILVER: return 2
-            case _: return 1
+        return BRICK_HP.get(btype, None)
 
     def getPosition(self) -> Position2D:
         return self._position
