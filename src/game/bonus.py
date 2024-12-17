@@ -2,7 +2,7 @@
 
 from src.game.ball import Ball
 
-from src.engine.solid_shapes import SolidRectangle
+from src.physics.solid_shapes import SolidRectangle
 
 from src.common import *
 

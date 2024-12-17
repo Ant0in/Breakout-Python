@@ -1,6 +1,8 @@
 
 
-from src.engine.solid_shapes import SolidRectangle
+from src.game.bonus import BonusInterface
+
+from src.physics.solid_shapes import SolidRectangle
 
 from src.common import Position2D, BrickType
 
@@ -8,7 +10,8 @@ from src.common import Position2D, BrickType
 
 class Brick:
     
-    def __init__(self, position: Position2D, width: float, height: float, btype: BrickType) -> None:
+    def __init__(self, position: Position2D, width: float, height: float,
+                 btype: BrickType, bonus: BonusInterface | None = None) -> None:
         
         self._position: Position2D = position
         self._width: float = width
@@ -17,7 +20,7 @@ class Brick:
         self._hitbox: SolidRectangle = SolidRectangle(position=position, height=height, width=width)
         self._hp: float | int = self._attributeBrickHpByType(btype=btype)
 
-    
+
     @staticmethod
     def _attributeBrickHpByType(btype: BrickType) -> int | float:
         match btype:

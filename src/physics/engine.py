@@ -7,7 +7,7 @@ from src.game.bonus import BonusInterface
 from src.player.player import Player
 from src.player.controller import GameController
 
-from src.engine.collision_helper import CollisionHelper
+from src.physics.collision_helper import CollisionHelper
 
 from src.common import Position2D, Action
 import math
@@ -62,24 +62,25 @@ class GameEngine:
         return bricks_hit
 
     @staticmethod
-    def _handleBricks(player: Player, bricks: list[Brick]) -> None:
+    def _handleBricks(gamebox: GameBox, player: Player, bricks: list[Brick]) -> None:
         
         for brick in bricks:
             brick.makeBrickLooseHP(loss=1)
             if brick.isBroken():
+                gamebox.removeBrick(brick=brick)
                 ...  # TODO : spawn bonus si bonus
                 player.getScore().addScore(increment=brick.getBrickValue())
             ... # TODO : changer le sprite de la brique si nécessaire
 
     @staticmethod
     def _handleBalls(gamebox: GameBox, player: Player) -> None:
-
         # Step 1: Move les balls dans la gamebox
         gamebox.tryMoveBalls()
-        # Step 2: Vérifier les collisions et gérer les briques
+        # Step 2: Vérifier les collisions
         GameEngine._handleCollisionsWithRaquette(gamebox=gamebox)
         b = GameEngine._handleCollisionWithBricks(gamebox=gamebox)
-        GameEngine._handleBricks(player=player, bricks=b)
+        # Step 3: Gérer les briques
+        GameEngine._handleBricks(gamebox=gamebox, player=player, bricks=b)
 
     @staticmethod
     def _handleCollisionWithEntities(gamebox: GameBox, player: Player) -> None:

@@ -2,7 +2,7 @@
 
 from src.game.game_box import GameBox
 
-from src.engine.solid_shapes import SolidRectangle, SolidCircle
+from src.physics.solid_shapes import SolidRectangle, SolidCircle
 
 from src.common import BRICK_COLORS
 

@@ -5,8 +5,8 @@ from src.game.raquette import Raquette
 from src.game.brick import Brick
 from src.game.bonus import BonusInterface
 
-from src.engine.collision_helper import CollisionHelper
-from src.engine.solid_shapes import SolidInterface, SolidRectangle
+from src.physics.collision_helper import CollisionHelper
+from src.physics.solid_shapes import SolidInterface, SolidRectangle
 
 from src.common import Position2D, WallType, BOX_WALLS_THICKNESS
 
@@ -81,9 +81,7 @@ class GameBox:
     def getRaquette(self) -> Raquette:
         return self._raquette
 
-
     # -------------------------- #
-
 
     def getLeftWall(self) -> SolidRectangle:
         return self._leftWall
@@ -114,9 +112,9 @@ class GameBox:
         
         # On fait une méthode qui vérifira si un objet collide avec un mur. Si c'est le cas, on return le mur.
         # Sinon, on ne return rien.
-        if CollisionHelper.isColliding(object.getHitbox(), self.getLeftWall()): return WallType.LEFT
-        elif CollisionHelper.isColliding(object.getHitbox(), self.getRightWall()): return WallType.RIGHT
-        elif CollisionHelper.isColliding(object.getHitbox(), self.getTopWall()): return WallType.TOP
+        if   CollisionHelper.isColliding(object.getHitbox(), self.getLeftWall()):   return WallType.LEFT
+        elif CollisionHelper.isColliding(object.getHitbox(), self.getRightWall()):  return WallType.RIGHT
+        elif CollisionHelper.isColliding(object.getHitbox(), self.getTopWall()):    return WallType.TOP
         elif CollisionHelper.isColliding(object.getHitbox(), self.getBottomWall()): return WallType.BOTTOM
         
         else: return None
@@ -124,10 +122,13 @@ class GameBox:
     def tryMoveRaquette(self, pos: Position2D) -> bool:
         
         # On essaye de move la raquette en regardant si collision avec les murs.
+        rq: Raquette = self.getRaquette()
+        temp: Raquette = Raquette(position=pos, width=rq.getWidth(), height=rq.getHeight(), sensibility=rq.getSensibility())
 
         # None -> Pas de collision.
-        if self.isObjectCollidingWithWalls(object=self.getRaquette()) is None:
+        if self.isObjectCollidingWithWalls(object=temp) is None:
             self.getRaquette().moveToCoordinates(c=pos)
+            del temp
             return True
         
         # WallType -> Collision.
@@ -162,6 +163,7 @@ class GameBox:
                     case WallType.TOP: ball.setVelocity(vx, -vy)
                     case WallType.BOTTOM: ...  # TODO : GameOver ?
 
-        return could_move
+            del temp
 
+        return could_move
 
