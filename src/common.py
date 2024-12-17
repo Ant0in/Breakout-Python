@@ -96,6 +96,9 @@ BOX_WALLS_THICKNESS: float = 10.0
 BALL_RADIUS: float = 10.0
 BALL_SPEED: float = 15.0
 
+LASER_THICKNESS: float = 10.0
+LASER_LENGTH: float = 1000.0
+
 BONUS_SIZE: float = 25.0
 BONUS_DEFAULT_POS: Position2D = Position2D(x=0, y=0)
 BONUS_FALLING_SPEED: float = 10.0
