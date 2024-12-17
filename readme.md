@@ -2,7 +2,7 @@
 
 ## Description
 
-For more details, please refer to `./pdf/project-2024.pdf`.
+For more details, please refer to `./pdf/consignes.pdf`.
 
 
 ## Usage
