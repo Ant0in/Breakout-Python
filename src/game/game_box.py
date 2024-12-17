@@ -90,6 +90,9 @@ class GameBox:
     def getRaquette(self) -> Raquette:
         return self._raquette
 
+    def setRaquette(self, rq: Raquette) -> None:
+        self._raquette = rq
+
     def getLeftWall(self) -> SolidRectangle:
         return self._leftWall
     
@@ -140,6 +143,30 @@ class GameBox:
         
         # WallType -> Collision.
         else: return False
+
+    def resizeRaquette(self, factor: float) -> None:
+        
+        rq: Raquette = self.getRaquette()
+        temp: Raquette = Raquette(position=rq.getPosition(), width=rq.getWidth() * factor,
+                                  height=rq.getHeight(), sensibility=rq.getSensibility())
+
+        collisionWithWall: WallType | None = self.isObjectCollidingWithWalls(object=temp)
+
+        # Premier cas : Fine, aucune collision, on peut donc écraser la raquette par temp.
+        if collisionWithWall is None:
+            self.setRaquette(rq=temp)
+
+        # Deuxième cas (edge case) : Raquette trop grande pour fit dans l'écran. On passe.
+        elif temp.getWidth() > self.getWidth(): ...
+
+        # Collision avec un seul mur (droit ou gauche).
+        else:
+            if collisionWithWall is WallType.LEFT:
+                temp.moveToCoordinates(c=Position2D(self.getPosition().getX(), temp.getPosition().getY()))
+            elif collisionWithWall is WallType.RIGHT:
+                temp.moveToCoordinates(c=Position2D(self.getPosition().getX() + self.getWidth() - temp.getWidth(), temp.getPosition().getY()))
+            else: raise NotImplementedError()
+            self.setRaquette(rq=temp)
 
     def tryMoveBalls(self) -> list[bool]:
         

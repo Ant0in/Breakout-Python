@@ -160,3 +160,23 @@ class PlayerBonus(BonusInterface):
         self.incrementDuration(incr=-1)
 
 
+class ResizeBonus(BonusInterface):
+
+    def __init__(self) -> None:
+        
+        # super init from interface for resize bonus
+        super().__init__(pos=BONUS_DEFAULT_POS,
+            size=BONUS_SIZE, active_duration=1,
+            falling_speed=BONUS_FALLING_SPEED,
+            is_active=False, is_spawned=False)
+        
+    def applyLogic(self, gb, player):
+
+        # is bonus is not active or has expired, we skip logic
+        if not self.isActive() or self.hasBonusDurationExpired():
+            return
+        
+        gb.resizeRaquette(factor=BONUS_RESIZE_FACTOR)
+
+        # decrement TTL (for player bonus, 1 logic cycle will be applied since it has TTL of 1)
+        self.incrementDuration(incr=-1)

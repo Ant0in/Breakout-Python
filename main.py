@@ -3,7 +3,7 @@ from src.game.game_box import GameBox
 from src.game.ball import Ball
 from src.game.raquette import Raquette
 from src.game.brick import Brick
-from src.game.bonus import DuplicationBonus, PlayerBonus
+from src.game.bonus import DuplicationBonus, PlayerBonus, ResizeBonus
 
 from src.player.player import Player
 from src.player.score import Score
@@ -25,11 +25,10 @@ if __name__ == "__main__":
         height=800,
         balls=[
             Ball(Position2D(400, 350), 10, 15),
-            Ball(Position2D(400, 250), 10, 15),
         ],
         raquette=Raquette(Position2D(300, 700), 200, 20, 10),
         bricks=[
-            Brick(Position2D(x, y), 60, 20, BrickType((i % 10) + 1), PlayerBonus())
+            Brick(Position2D(x, y), 60, 20, BrickType((i % 10) + 1), ResizeBonus())
             for i in range(12)
             for _, y in enumerate(range(50, 150, 25))
             for x in [50 + i * 62]

@@ -99,4 +99,4 @@ BALL_SPEED: float = 15.0
 BONUS_SIZE: float = 25.0
 BONUS_DEFAULT_POS: Position2D = Position2D(x=0, y=0)
 BONUS_FALLING_SPEED: float = 10.0
-
+BONUS_RESIZE_FACTOR: float = 1.5

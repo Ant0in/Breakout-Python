@@ -12,7 +12,7 @@ For more details, please refer to `./pdf/consignes.pdf`.
 - [ ] Add "level up" to the win handling routine
 - [ ] Mouse / Trackpad support
 - [ ] Laser Bonus
-- [ ] Resize Bonus
+- [x] Resize Bonus
 - [ ] Grab Bonus
 - [ ] Build a SFXHelper 
 
@@ -45,7 +45,7 @@ Make sure you have `Python >= 3.11` installed.
 4. Run the project:
 
    ```bash
-   python ".\main.py" (--options)
+   python ".\main.py"
    ```
 
 ## License
