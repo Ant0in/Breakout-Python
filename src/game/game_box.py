@@ -8,7 +8,7 @@ from src.game.bonus import BonusInterface
 from src.physics.collision_helper import CollisionHelper
 from src.physics.solid_shapes import SolidInterface, SolidRectangle
 
-from src.common import Position2D, WallType, BOX_WALLS_THICKNESS
+from src.common import Position2D, WallType, BrickType, BOX_WALLS_THICKNESS
 
 
 
@@ -75,6 +75,9 @@ class GameBox:
     def getBalls(self) -> list[Ball]:
         return self._balls
     
+    def isBallVectorEmpty(self) -> bool:
+        return (len(self.getBalls()) == 0)
+
     def addBall(self, b: Ball) -> None:
         self.getBalls().append(b)
 
@@ -83,8 +86,6 @@ class GameBox:
     
     def getRaquette(self) -> Raquette:
         return self._raquette
-
-    # -------------------------- #
 
     def getLeftWall(self) -> SolidRectangle:
         return self._leftWall
@@ -170,3 +171,11 @@ class GameBox:
 
         return could_move
 
+    def isWin(self) -> bool:
+        # On va parcourir les bricks restantes. Si il existe une brique (non détruite)
+        # autre que des dorées, alors on a pas encore win.
+        for b in self.getBricks():
+            if (not b.isBroken()) and (b.getBrickType() is not BrickType.GOLD):
+                return False
+        return True
+    

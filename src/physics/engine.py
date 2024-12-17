@@ -3,14 +3,16 @@
 from src.game.game_box import GameBox
 from src.game.brick import Brick
 from src.game.bonus import BonusInterface
+from src.game.ball import Ball
 
 from src.player.player import Player
 from src.player.controller import GameController
 
 from src.physics.collision_helper import CollisionHelper
 
-from src.common import Position2D, Action
+from src.common import Position2D, Action, BALL_RADIUS, BALL_SPEED
 import math
+import sys
 
 
 class GameEngine:
@@ -143,8 +145,47 @@ class GameEngine:
         GameEngine._handleBonusLogic(gamebox=gamebox, player=player)
 
     @staticmethod
+    def _handleBallSpawn(gamebox: GameBox) -> None:
+        
+        # TODO : Faire une belle fonction de spawn fonctionnelle
+        # TODO : qui gère proprement la remise de la balle en jeu.
+        center: Position2D = gamebox.getHitbox().getCenterPosition()
+        b: Ball = Ball(center=center, radius=BALL_RADIUS, speed=BALL_SPEED)
+        gamebox.addBall(b=b)
+
+    @staticmethod
+    def _handleGameOver(gamebox: GameBox, player: Player) -> None:
+
+        # TODO : Gameover handling.
+        print('loose')
+        sys.exit(0)
+
+    @staticmethod
+    def _handleWin(gamebox: GameBox, player: Player) -> None:
+
+        # TODO : Win handling.
+        print('win')
+        sys.exit(0)
+
+    @staticmethod
+    def _handleGameState(gamebox: GameBox, player: Player) -> None:
+        
+        # Step 1: Vérifier si la game est en état "win"
+        if gamebox.isWin():
+            GameEngine._handleWin(gamebox=gamebox, player=player)
+
+        # Step 2: Vérifier si le vecteur de ball est vide (état: perte de vie)
+        if gamebox.isBallVectorEmpty():
+            player.incrementHp(incr=-1)
+            # Puis vérifier si le player est en vie
+            if player.isDead(): GameEngine._handleGameOver(gamebox=gamebox, player=player)
+            else: GameEngine._handleBallSpawn(gamebox=gamebox)
+
+    @staticmethod
     def handle_routine(gamebox: GameBox, player: Player) -> None:
-        a = GameEngine._handleInputs(controller=player.getController())
+        a: Action = GameEngine._handleInputs(controller=player.getController())
         GameEngine._handleActions(gamebox=gamebox, action=a)
         GameEngine._handleBalls(gamebox=gamebox, player=player)
         GameEngine._handleBonus(gamebox=gamebox, player=player)
+        GameEngine._handleGameState(gamebox=gamebox, player=player)
+

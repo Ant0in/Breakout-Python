@@ -79,7 +79,7 @@ class Brick:
         self.setHP(v=dhp)
 
     def isBroken(self) -> bool:
-        return self.getHP() <= 0
+        return (self.getHP() <= 0)
     
     def getBrickValue(self) -> int:
         match self.getBrickType():

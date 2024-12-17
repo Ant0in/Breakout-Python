@@ -63,12 +63,16 @@ BRICK_COLORS: dict = {
     BrickType.GOLD: "#FFD700",          # Or
 }
 
+INFINITY: float = float('inf')
 
+GAME_FRAMERATE: int = 60
 
 BOX_WALLS_THICKNESS: float = 10.0
-GAME_FRAMERATE: int = 60
+
+BALL_RADIUS: float = 10.0
+BALL_SPEED: float = 15.0
+
 BONUS_SIZE: float = 25.0
 BONUS_DEFAULT_POS: Position2D = Position2D(x=0, y=0)
 BONUS_FALLING_SPEED: float = 10.0
-INFINITY: float = float('inf')
 
