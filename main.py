@@ -11,7 +11,7 @@ from src.player.controller import GameController
 
 from src.gui.gui import GameGUI
 
-from src.engine.engine import GameEngine
+from src.physics.engine import GameEngine
 
 from src.common import Position2D, BrickType
 
