@@ -43,11 +43,6 @@ class Raquette:
     def setSensibility(self, s: float) -> None:
         self._sensibility = s
 
-    def calculateCenterPosition(self) -> Position2D:
-        cx: float = self.getPosition().getX() + (self.getWidth() / 2)
-        cy: float = self.getPosition().getY() + (self.getHeight() / 2)
-        return Position2D(x=cx, y=cy)
-
     def moveToCoordinates(self, c: Position2D) -> None:
         # On move la raquette avec sa hitbox.
         self.setPosition(p=c)

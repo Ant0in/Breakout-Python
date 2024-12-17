@@ -17,6 +17,7 @@ class Ball:
         self._speed: float = speed
         self._x_velocity: float = 0.0
         self._y_velocity: float = 1.0
+        self._isAlive: bool = True
 
     def getCenterPosition(self) -> Position2D:
         return self._center
@@ -45,6 +46,12 @@ class Ball:
     
     def setSpeed(self, s: float) -> None:
         self._speed = s
+
+    def isAlive(self) -> bool:
+        return self._isAlive
+    
+    def setAlive(self, flag: bool) -> None:
+        self._isAlive = flag
 
     def moveToCoordinates(self, c: Position2D) -> None:
         # On move la ball avec sa hitbox.

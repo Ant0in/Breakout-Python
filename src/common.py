@@ -67,7 +67,7 @@ BRICK_COLORS: dict = {
 
 BOX_WALLS_THICKNESS: float = 10.0
 GAME_FRAMERATE: int = 60
-BONUS_SIZE: float = 10.0
+BONUS_SIZE: float = 25.0
 BONUS_DEFAULT_POS: Position2D = Position2D(x=0, y=0)
 BONUS_FALLING_SPEED: float = 10.0
 INFINITY: float = float('inf')

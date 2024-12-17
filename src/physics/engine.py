@@ -34,7 +34,7 @@ class GameEngine:
                 vx, vy = ball.getVelocity()
                 total_velocity: float = math.sqrt((vx**2 + vy**2))
                 L: float = gamebox.getRaquette().getWidth()
-                x: float = ball.getCenterPosition().getX() - gamebox.getRaquette().calculateCenterPosition().getX()
+                x: float = ball.getCenterPosition().getX() - gamebox.getRaquette().getHitbox().getCenterPosition().getX()
                 alpha: float = (math.pi / 6) + ((5 * math.pi) / 6) * (1 - (x / L))  # modifiée pour 30->150
                 dvx: float = total_velocity * math.sin(alpha)
                 dvy: float = total_velocity * math.cos(alpha)
@@ -62,23 +62,38 @@ class GameEngine:
         return bricks_hit
 
     @staticmethod
+    def _calculateBonusSpawnPosition(brick: Brick, bonus: BonusInterface) -> Position2D:
+        brick_center: Position2D = brick.getHitbox().getCenterPosition()
+        offset_center: Position2D = Position2D(brick_center.getX() - bonus.getSize() / 2, brick_center.getY() - bonus.getSize() / 2)
+        return offset_center
+
+    @staticmethod
     def _handleBricks(gamebox: GameBox, player: Player, bricks: list[Brick]) -> None:
         
         for brick in bricks:
 
             brick.makeBrickLooseHP(loss=1)
+            # Si la brique casse, on la remove
             if brick.isBroken():
-                
                 gamebox.removeBrick(brick=brick)
 
+                # Si la brique contient un bonus, on le fait spawn
                 if brick.doesBrickContainsBonus():
                     bonus: BonusInterface = brick.getBonus()
                     gamebox.addEntity(entity=bonus)
-                    bonus.spawnBonus(p=brick.getPosition())
+                    bonus.spawnBonus(p=GameEngine._calculateBonusSpawnPosition(brick=brick, bonus=bonus))
 
+                # Puis on ajoute le score obtenu
                 player.getScore().addScore(increment=brick.getBrickValue())
 
-            ... # TODO : changer le sprite de la brique si nécessaire
+            else:
+                ... # TODO : changer le sprite de la brique si nécessaire
+
+    @staticmethod
+    def _handleDeadBalls(gamebox: GameBox) -> None:
+        for ball in gamebox.getBalls():
+            if not ball.isAlive():
+                gamebox.removeBall(b=ball)
 
     @staticmethod
     def _handleBalls(gamebox: GameBox, player: Player) -> None:
@@ -89,6 +104,8 @@ class GameEngine:
         b = GameEngine._handleCollisionWithBricks(gamebox=gamebox)
         # Step 3: Gérer les briques
         GameEngine._handleBricks(gamebox=gamebox, player=player, bricks=b)
+        # Step 4: Dégager les balls qui sont mortes
+        GameEngine._handleDeadBalls(gamebox=gamebox)
 
     @staticmethod
     def _handleCollisionWithEntities(gamebox: GameBox, player: Player) -> None:
@@ -102,6 +119,7 @@ class GameEngine:
             # On vérifie si tu récupères 
             if CollisionHelper.isColliding(entity.getHitbox(), gamebox.getRaquette().getHitbox()):
                 player.addBonus(b=entity)
+                entity.setActive(flag=True)
                 gamebox.removeEntity(entity=entity)
 
             # Sinon, on vérifie si elle ne sort pas de l'écran. Auquel cas, on peut la détruire.
@@ -112,7 +130,12 @@ class GameEngine:
 
     @staticmethod
     def _handleBonusLogic(gamebox: GameBox, player: Player) -> None:
-        ...
+        
+        for bonus in player.getBonus():
+            # On exécute la logique, puis si expired alors on le remove.
+            bonus.applyLogic(gb=gamebox)
+            if bonus.hasBonusDurationExpired():
+                player.removeBonus(b=bonus)
 
     @staticmethod
     def _handleBonus(gamebox: GameBox, player: Player) -> None:

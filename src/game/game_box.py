@@ -77,6 +77,9 @@ class GameBox:
     
     def addBall(self, b: Ball) -> None:
         self.getBalls().append(b)
+
+    def removeBall(self, b: Ball) -> None:
+        if b in self.getBalls(): self.getBalls().remove(b)
     
     def getRaquette(self) -> Raquette:
         return self._raquette
@@ -161,7 +164,7 @@ class GameBox:
                     case WallType.LEFT: ball.setVelocity(-vx, vy)
                     case WallType.RIGHT: ball.setVelocity(-vx, vy)
                     case WallType.TOP: ball.setVelocity(vx, -vy)
-                    case WallType.BOTTOM: ...  # TODO : GameOver ?
+                    case WallType.BOTTOM: ball.setAlive(flag=False)  # Ball is unusable
 
             del temp
 

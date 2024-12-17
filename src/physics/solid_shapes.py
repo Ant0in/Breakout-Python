@@ -42,6 +42,11 @@ class SolidRectangle(SolidInterface):
         bottom_left: Position2D = Position2D(top_left.getX(), top_left.getY() - self.getHeight())
         bottom_right: Position2D = Position2D(top_left.getX() + self.getWidth(), top_left.getY() - self.getHeight())
         return [top_left, top_right, bottom_left, bottom_right]
+    
+    def getCenterPosition(self) -> Position2D:
+        cx: float = self.getPosition().getX() + (self.getWidth() / 2)
+        cy: float = self.getPosition().getY() + (self.getHeight() / 2)
+        return Position2D(x=cx, y=cy)
 
     def isPointInSolid(self, point: Position2D) -> bool:
 

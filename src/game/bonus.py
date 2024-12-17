@@ -8,6 +8,7 @@ from src.common import *
 
 from abc import ABC, abstractmethod
 import math
+import random
 
 
 
@@ -90,8 +91,7 @@ class BonusInterface(ABC):
         return (self.getDuration() <= 0)
     
     @abstractmethod
-    def applyLogic(self, gb) -> any:
-        # TODO : Implement logic for each bonuses that inherits from the interface
+    def applyLogic(self, gb) -> None:
         raise NotImplementedError()
 
 
@@ -120,7 +120,7 @@ class DuplicationBonus(BonusInterface):
         
         # if bonus is active and not expired, we will proceed to apply logic for 
         # a frame (usually making the bonus vanish) and then decrement TTL.
-        ref: Ball = gb.getBalls()[0]  # lets grab the first ball of the bunch to do that
+        ref: Ball = random.choice(gb.getBalls())  # lets grab random ball of the bunch to do that
         vx, vy = ref.getVelocity()
 
         b1: Ball = Ball(center=ref.getCenterPosition(), radius=ref.getRadius(), speed=ref.getSpeed())
@@ -128,8 +128,8 @@ class DuplicationBonus(BonusInterface):
         
         vx1, vy1 = self.rotate_velocity(vx, vy, 120)
         vx2, vy2 = self.rotate_velocity(vx, vy, -120)
-        b1.setVelocity(_xv=vx1, _yx=vy1)
-        b2.setVelocity(_xv=vx2, _yx=vy2)
+        b1.setVelocity(_xv=vx1, _yv=vy1)
+        b2.setVelocity(_xv=vx2, _yv=vy2)
 
         gb.addBall(b=b1)
         gb.addBall(b=b2)
