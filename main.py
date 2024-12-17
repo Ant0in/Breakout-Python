@@ -28,7 +28,7 @@ if __name__ == "__main__":
         ],
         raquette=Raquette(Position2D(300, 700), 200, 20, 10),
         bricks=[
-            Brick(Position2D(x, y), 60, 20, BrickType((i % 10) + 1), ResizeBonus())
+            Brick(Position2D(x, y), 60, 20, BrickType((i % 10) + 1), DuplicationBonus())
             for i in range(12)
             for _, y in enumerate(range(50, 150, 25))
             for x in [50 + i * 62]

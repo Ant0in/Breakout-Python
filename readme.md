@@ -15,6 +15,8 @@ For more details, please refer to `./pdf/consignes.pdf`.
 - [x] Resize Bonus
 - [ ] Grab Bonus
 - [ ] Build a SFXHelper 
+- [ ] Apply `./pdf/consignes.pdf` rules for bonuses.
+- [ ] Add better ball spawn mechanics
 
 
 ## Usage
