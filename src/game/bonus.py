@@ -91,7 +91,7 @@ class BonusInterface(ABC):
         return (self.getDuration() <= 0)
     
     @abstractmethod
-    def applyLogic(self, gb) -> None:
+    def applyLogic(self, gb, player) -> None:
         raise NotImplementedError()
 
 
@@ -112,7 +112,7 @@ class DuplicationBonus(BonusInterface):
         nvy: float = vx * math.sin(alpha_rad) + vy * math.cos(alpha_rad)
         return nvx, nvy
         
-    def applyLogic(self, gb) -> None:
+    def applyLogic(self, gb, player) -> None:
 
         # is bonus is not active or has expired, we skip logic
         if not self.isActive() or self.hasBonusDurationExpired():
@@ -135,6 +135,28 @@ class DuplicationBonus(BonusInterface):
         gb.addBall(b=b2)
 
         # decrement TTL (for dupe, 1 logic cycle will be applied since it has TTL of 1)
+        self.incrementDuration(incr=-1)
+
+
+class PlayerBonus(BonusInterface):
+
+    def __init__(self) -> None:
+        
+        # super init from interface for hp bonus
+        super().__init__(pos=BONUS_DEFAULT_POS,
+            size=BONUS_SIZE, active_duration=1,
+            falling_speed=BONUS_FALLING_SPEED,
+            is_active=False, is_spawned=False)
+    
+    def applyLogic(self, gb, player):
+
+        # is bonus is not active or has expired, we skip logic
+        if not self.isActive() or self.hasBonusDurationExpired():
+            return
+        
+        player.incrementHp(incr=1)
+
+        # decrement TTL (for player bonus, 1 logic cycle will be applied since it has TTL of 1)
         self.incrementDuration(incr=-1)
 
 

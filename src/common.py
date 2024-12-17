@@ -64,7 +64,6 @@ BRICK_COLORS: dict = {
     BrickType.SILVER: "#C0C0C0",        # Argent
     BrickType.GOLD: "#FFD700",          # Or
 }
-
 BRICK_HP: dict = {
     BrickType._NONE: None,
     BrickType.WHITE: 1,
@@ -78,7 +77,17 @@ BRICK_HP: dict = {
     BrickType.SILVER: 2,
     BrickType.GOLD: INFINITY
 }
-
+BRICK_VALUE: dict = {
+    BrickType.WHITE: 50,
+    BrickType.ORANGE: 60,
+    BrickType.CYAN: 70,
+    BrickType.GREEN: 80,
+    BrickType.RED: 90,
+    BrickType.BLUE: 100,
+    BrickType.MAGENTA: 110,
+    BrickType.YELLOW: 120,
+    BrickType.SILVER: 200,
+}
 
 GAME_FRAMERATE: int = 60
 

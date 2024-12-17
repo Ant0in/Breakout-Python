@@ -4,7 +4,7 @@ from src.game.bonus import BonusInterface
 
 from src.physics.solid_shapes import SolidRectangle
 
-from src.common import Position2D, BrickType, BRICK_HP
+from src.common import Position2D, BrickType, BRICK_HP, BRICK_VALUE
 
 
 
@@ -25,7 +25,9 @@ class Brick:
 
     @staticmethod
     def _attributeBrickHpByType(btype: BrickType) -> int | float:
-        return BRICK_HP.get(btype, None)
+        hp: float | int | None = BRICK_HP.get(btype, None)
+        if hp is not None: return hp
+        else: raise NotImplementedError(f'[E] Error for brick type : {btype}')
 
     def getPosition(self) -> Position2D:
         return self._position
@@ -79,16 +81,8 @@ class Brick:
         return (self.getHP() <= 0)
     
     def getBrickValue(self) -> int:
-        match self.getBrickType():
-            case BrickType.WHITE: return 50
-            case BrickType.ORANGE: return 60
-            case BrickType.CYAN: return 70
-            case BrickType.GREEN: return 80
-            case BrickType.RED: return 90
-            case BrickType.BLUE: return 100
-            case BrickType.MAGENTA: return 110
-            case BrickType.YELLOW: return 120
-            case BrickType.SILVER: return 200
-            case _: raise NotImplementedError()
-
+        btype: BrickType = self.getBrickType()
+        val: int | None = BRICK_VALUE.get(btype, None)
+        if val is not None: return val
+        else: raise NotImplementedError(f'[E] Unknown brick value for brick type : {val}')
 

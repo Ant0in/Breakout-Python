@@ -135,7 +135,7 @@ class GameEngine:
         
         for bonus in player.getBonus():
             # On exécute la logique, puis si expired alors on le remove.
-            bonus.applyLogic(gb=gamebox)
+            bonus.applyLogic(gb=gamebox, player=player)
             if bonus.hasBonusDurationExpired():
                 player.removeBonus(b=bonus)
 
