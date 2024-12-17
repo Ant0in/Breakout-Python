@@ -28,4 +28,3 @@ class GameController:
         # Aucune action
         return Action._NONE
 
-

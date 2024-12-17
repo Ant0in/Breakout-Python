@@ -82,8 +82,8 @@ class BonusInterface(ABC):
     def getGravityPosition(self) -> Position2D:
         # using x(t) = x0 + velocity*t, for t=1 (bc calculated each frame)
         tl: Position2D = self.getPosition()
-        _x: float = tl.getX() - self.getFallingSpeed()
-        _y: float = tl.getY()
+        _x: float = tl.getX() 
+        _y: float = tl.getY() + self.getFallingSpeed()
         return Position2D(x=_x, y=_y)
 
     def hasBonusDurationExpired(self) -> bool:
@@ -97,10 +97,10 @@ class BonusInterface(ABC):
 
 class DuplicationBonus(BonusInterface):
     
-    def __init__(self, pos: Position2D) -> None:
+    def __init__(self) -> None:
         
         # super init from interface for duplication bonus
-        super().__init__(pos=pos,
+        super().__init__(pos=BONUS_DEFAULT_POS,
             size=BONUS_SIZE, active_duration=1,
             falling_speed=BONUS_FALLING_SPEED,
             is_active=False, is_spawned=False)

@@ -17,6 +17,8 @@ class Brick:
         self._width: float = width
         self._height: float = height
         self._btype: BrickType = btype
+        self._bonus: BonusInterface | None = bonus
+
         self._hitbox: SolidRectangle = SolidRectangle(position=position, height=height, width=width)
         self._hp: float | int = self._attributeBrickHpByType(btype=btype)
 
@@ -49,6 +51,15 @@ class Brick:
     def getBrickType(self) -> BrickType:
         return self._btype
     
+    def getBonus(self) -> None | BonusInterface:
+        return self._bonus
+    
+    def setBonus(self, b: BonusInterface) -> None:
+        self._bonus = b
+
+    def doesBrickContainsBonus(self) -> bool:
+        return (self.getBonus() is not None)
+
     def getHP(self) -> int | float:
         return self._hp
     

@@ -22,15 +22,11 @@ class GameGUI(tk.Tk):
         self.lastupdate = time.time()
 
     def update_gui(self):
-
         self.canvas.delete("all")
-
-        # dessiner les raquettes
         self.draw_rectangle(self.gamebox.getRaquette().getHitbox(), fill="blue")
-        # dessiner les balls
         for ball in self.gamebox.getBalls(): self.draw_circle(ball.getHitbox(), fill="red")
-        # dessiner les bricks
-        for brick in self.gamebox.getBricks(): self.draw_rectangle(brick, fill=BRICK_COLORS[brick.getBrickType()])
+        for brick in self.gamebox.getBricks(): self.draw_rectangle(brick.getHitbox(), fill=BRICK_COLORS[brick.getBrickType()])
+        for bonus in self.gamebox.getEntities(): self.draw_rectangle(bonus.getHitbox(), fill='black')
         self.update_fps()
 
     def update_fps(self):

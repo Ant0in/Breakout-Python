@@ -65,11 +65,19 @@ class GameEngine:
     def _handleBricks(gamebox: GameBox, player: Player, bricks: list[Brick]) -> None:
         
         for brick in bricks:
+
             brick.makeBrickLooseHP(loss=1)
             if brick.isBroken():
+                
                 gamebox.removeBrick(brick=brick)
-                ...  # TODO : spawn bonus si bonus
+
+                if brick.doesBrickContainsBonus():
+                    bonus: BonusInterface = brick.getBonus()
+                    gamebox.addEntity(entity=bonus)
+                    bonus.spawnBonus(p=brick.getPosition())
+
                 player.getScore().addScore(increment=brick.getBrickValue())
+
             ... # TODO : changer le sprite de la brique si nécessaire
 
     @staticmethod
