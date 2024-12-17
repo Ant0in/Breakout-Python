@@ -78,6 +78,9 @@ class GameBox:
     def isBallVectorEmpty(self) -> bool:
         return (len(self.getBalls()) == 0)
 
+    def doesPlayerHaveMutlipleBalls(self) -> bool:
+        return (len(self.getBalls()) > 1)
+
     def addBall(self, b: Ball) -> None:
         self.getBalls().append(b)
 

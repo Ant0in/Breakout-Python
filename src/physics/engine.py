@@ -79,8 +79,8 @@ class GameEngine:
             if brick.isBroken():
                 gamebox.removeBrick(brick=brick)
 
-                # Si la brique contient un bonus, on le fait spawn
-                if brick.doesBrickContainsBonus():
+                # Si la brique contient un bonus ET que le joueur n'a qu'une seule balle, on le fait spawn
+                if brick.doesBrickContainsBonus() and not gamebox.doesPlayerHaveMutlipleBalls():
                     bonus: BonusInterface = brick.getBonus()
                     gamebox.addEntity(entity=bonus)
                     bonus.spawnBonus(p=GameEngine._calculateBonusSpawnPosition(brick=brick, bonus=bonus))

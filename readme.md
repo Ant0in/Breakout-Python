@@ -4,6 +4,18 @@
 
 For more details, please refer to `./pdf/consignes.pdf`.
 
+## Tasks
+
+- [ ] Create main menu
+- [ ] Rework the GUI
+- [ ] Add an easy way to import levels
+- [ ] Add "level up" to the win handling routine
+- [ ] Mouse / Trackpad support
+- [ ] Laser Bonus
+- [ ] Resize Bonus
+- [ ] Grab Bonus
+- [ ] Build a SFXHelper 
+
 
 ## Usage
 
